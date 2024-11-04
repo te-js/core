@@ -1,5 +1,5 @@
 import { customId } from "../utils";
-import Component from "./stateful";
+import { default as Component, default as Stateful } from "./stateful";
 
 export class Stateless<T extends Tag> {
   tag: T;
@@ -17,6 +17,21 @@ export class Stateless<T extends Tag> {
     this.path = [];
     this.props = props;
     this.children = children;
+  }
+  public setPath() {
+    function dfs(current: Stateless<T> | Stateful | any, path: number[]) {
+      let child;
+      if (current instanceof Stateful) {
+        child = current.build();
+      } else if (current instanceof Stateless) {
+        child = current;
+      } else return;
+      child!.path = path;
+      for (let i = 0; i < child!.children.length; i++) {
+        dfs(child!.children[i], [...path, i]);
+      }
+    }
+    dfs(this, this.path);
   }
 }
 

@@ -54,5 +54,13 @@ function addProps(element: HTMLElement, props: object) {
   }
 }
 
-export { GLOBAL, TODO, convertElementToHTMLNMode, customId };
+function getElementFromPath(path: number[]) {}
+
+export {
+  GLOBAL,
+  TODO,
+  convertElementToHTMLNMode,
+  customId,
+  getElementFromPath,
+};
 

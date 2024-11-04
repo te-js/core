@@ -2,18 +2,18 @@ import { htmlTags } from "../tags";
 import Stateful from "./stateful";
 import Stateless from "./stateless";
 
-type BaseElement = Stateful | any;
+type BaseElement<T extends Tag> = Stateless<T> | Stateful | any;
 
 function baseComponent<T extends Tag>(
   tag: T,
   props: IntrinsicAttributes<T>,
-  ...children: BaseElement[]
+  ...children: BaseElement<T>[]
 ): Stateless<T> {
   return new Stateless(tag, props, ...children);
 }
 type ComponentBuilder = {
-  (props?: Stateless<Tag>["props"], ...children: BaseElement[]): Stateless<Tag>;
-  (...children: BaseElement[]): Stateless<Tag>;
+  (props?: Stateless<Tag>["props"], ...children: BaseElement<Tag>[]): Stateless<Tag>;
+  (...children: BaseElement<Tag>[]): Stateless<Tag>;
 };
 const components = Object.fromEntries(
   htmlTags.map((tag) => [
