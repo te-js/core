@@ -34,6 +34,9 @@ type AriaAttributes = {
   "aria-valuetext"?: string; // Defines the text alternative for the current value of a range widget
 };
 
+type HTMLEvents<T extends Tag> = HTMLElementEventMap;
+
+document.addEventListener();
 type HtmlAttributes = {
   accept?: string; // file input types
   "accept-charset"?: string; // form character set
@@ -168,6 +171,7 @@ type HtmlAttributes = {
   width?: number | string; // element width
   wrap?: "hard" | "soft" | "off"; // textarea wrap setting
 };
+
 type ElementAttributes = {
   a: {
     href: string; // Link to another document
@@ -228,3 +232,4 @@ type Merge<T1, T2> = T1 & T2;
 type IntrinsicAttributes<T extends Tag> = AriaAttributes &
   HtmlAttributes &
   ElementAttributes[T];
+  // HTMLEvents<T>
