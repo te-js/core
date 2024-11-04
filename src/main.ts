@@ -1,10 +1,27 @@
-import { div, h1, h2, p, section } from "./core";
+import { button, div, h1, h2, link, p, section } from "./core";
 import Stateful from "./core/component/stateful";
 import run from "./core/run";
 
 class Test extends Stateful {
+  counter = 0;
   build() {
-    return div("prova", h1(), prova(), new Test2());
+    return div(
+      link({ rel: "stylesheet", href: "style.css" }),
+      div(
+        { class: "center" },
+        h1(
+          {
+            class: "prova",
+          },
+          `ciao ${this.counter}`
+        ),
+        button({ class: "counter", onclick: () => this.onclick() }, "+ 1")
+      )
+    );
+  }
+  onclick() {
+    console.log(this.counter);
+    this.set(() => this.counter++);
   }
 }
 class Test2 extends Stateful {
@@ -12,9 +29,8 @@ class Test2 extends Stateful {
     return section(div(), h2());
   }
 }
-
 function prova() {
-  return div(1, p("p"));
+  return div({ class: "counter" }, 1, p("p"));
 }
 
 run(new Test());

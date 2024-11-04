@@ -7,6 +7,7 @@ abstract class Stateful {
   @sealed
   public set(callback: () => void) {
     callback();
+    // Get the parent and replace it with the new build()
     this.build();
   }
   public abstract build(): Stateless<Tag>;

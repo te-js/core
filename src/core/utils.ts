@@ -28,11 +28,13 @@ function convertElementToHTMLNMode<T extends Tag>(element: Stateless<T>) {
     for (let child of node.children) {
       if (child instanceof Stateless) {
         const childNode = document.createElement(child.tag);
+        addProps(childNode, child.props);
         dfs(child, childNode);
         htmlNode.appendChild(childNode);
       } else if (child instanceof Stateful) {
         const build = child.build();
         const childNode = document.createElement(build.tag);
+        addProps(childNode, build.props);
         dfs(build, childNode);
         htmlNode.appendChild(childNode);
       } else {
@@ -45,4 +47,12 @@ function convertElementToHTMLNMode<T extends Tag>(element: Stateless<T>) {
   return root;
 }
 
+function addProps(element: HTMLElement, props: object) {
+  for (const [key, value] of Object.entries(props)) {
+    if (key.startsWith("on")) element.addEventListener(key.slice(2), value);
+    else element.setAttribute(key, value);
+  }
+}
+
 export { GLOBAL, TODO, convertElementToHTMLNMode, customId };
+

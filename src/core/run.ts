@@ -8,5 +8,4 @@ export default function run(page: Stateful) {
   console.log(root);
 
   document.body.appendChild(root);
-  // document.body.appendChild()
 }
