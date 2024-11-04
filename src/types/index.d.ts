@@ -4,6 +4,7 @@ type Attributes<T extends Tag> = Map<
   ElementTagNameMap[T]
 >;
 
+declare namespace Mino {}
 // declare module globalThis {
 //   interface HTMLElement {
 //     tag: Tag;

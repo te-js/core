@@ -1,28 +1,31 @@
-import Component from "./component";
-import { htmlTags } from "./tags";
+import { htmlTags } from "../tags";
+import Stateful from "./stateful";
+import Stateless from "./stateless";
 
-type BaseComponent = Component | any;
+type BaseElement = Stateful | any;
 
 function baseComponent<T extends Tag>(
   tag: T,
   props: IntrinsicAttributes<T>,
-  ...children: BaseComponent[]
-) {
-  return new Component(tag, props, ...children);
+  ...children: BaseElement[]
+): Stateless<T> {
+  return new Stateless(tag, props, ...children);
 }
 type ComponentBuilder = {
-  (props?: Component["props"], ...children: BaseComponent[]): Component;
-  (...children: BaseComponent[]): Component;
+  (props?: Stateless<Tag>["props"], ...children: BaseElement[]): Stateless<Tag>;
+  (...children: BaseElement[]): Stateless<Tag>;
 };
 const components = Object.fromEntries(
   htmlTags.map((tag) => [
     tag,
     ((...args: any[]) => {
-      if (args[0] instanceof Component || typeof args[0] === "object") {
+      if (args[0] instanceof Stateful || args[0] instanceof Stateless) {
         return baseComponent(tag, {}, ...args);
-      } else {
+      } else if (typeof args[0] === "object") {
         const [props = {}, ...children] = args;
         return baseComponent(tag, { ...props }, ...children);
+      } else {
+        return baseComponent(tag, {}, ...args);
       }
     }) as ComponentBuilder,
   ])

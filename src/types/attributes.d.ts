@@ -36,7 +36,6 @@ type AriaAttributes = {
 
 type HTMLEvents<T extends Tag> = HTMLElementEventMap;
 
-document.addEventListener();
 type HtmlAttributes = {
   accept?: string; // file input types
   "accept-charset"?: string; // form character set
