@@ -1,8 +1,4 @@
-import {
-  convertElementToHTMLNMode,
-  getElementFromPath,
-  replaceHTMLElement,
-} from "../utils";
+import { convertElementToHTMLNMode, replaceHTMLElement } from "../utils";
 import { sealed } from "./decorators";
 import { Stateless } from "./stateless";
 
@@ -11,11 +7,14 @@ abstract class Stateful {
   public get path() {
     return this._path;
   }
+  public async init() {}
   public set path(path: number[]) {
     this._path = path;
   }
 
-  constructor() {}
+  constructor() {
+    this.init();
+  }
 
   @sealed
   public setPath(path: number[]) {
@@ -24,9 +23,10 @@ abstract class Stateful {
 
   @sealed
   public set(callback: () => void) {
-    const element = getElementFromPath(this.path);
-    // console.log(element, convertElementToHTMLNMode(this.build()));
     callback();
+    this.refresh();
+  }
+  public refresh() {
     replaceHTMLElement(this._path, convertElementToHTMLNMode(this.build()));
   }
   public abstract build(): Stateless<Tag>;
