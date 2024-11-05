@@ -1,36 +1,41 @@
-import { button, div, h1, h2, link, p, section } from "./core";
+import { a, button, div, h1, main, p } from "./core";
 import Stateful from "./core/component/stateful";
 import run from "./core/run";
 
+class Main extends Stateful {
+  build() {
+    return main(div(p("ciao mondo"), h1("example counter"), new Test()));
+  }
+}
+
 class Test extends Stateful {
-  counter = 0;
+  counter = "ciao";
+  result = {};
   build() {
     return div(
-      link({ rel: "stylesheet", href: "style.css" }),
+      // link({ rel: "stylesheet", href: "style.css" }),
+      a({ href: "https://google.com" }, "Google"),
       div(
-        { class: "center" },
         h1(
           {
             class: "prova",
           },
-          `ciao ${this.counter}`
+          `ciao ${this.counter}`,
+          JSON.stringify(this.result)
         ),
         button({ class: "counter", onclick: () => this.onclick() }, "+ 1")
       )
     );
   }
   onclick() {
-    console.log(this.counter);
-    this.set(() => this.counter++);
+    fetch("https://jsonplaceholder.typicode.com/todos/1")
+      .then((response) => response.json())
+      .then((json) => {
+        console.log(json);
+        this.set(() => (this.result = json));
+      });
+    this.set(() => (this.counter += "a"));
   }
-}
-class Test2 extends Stateful {
-  build() {
-    return section(div(), h2());
-  }
-}
-function prova() {
-  return div({ class: "counter" }, 1, p("p"));
 }
 
-run(new Test());
+run(new Main());

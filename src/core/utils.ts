@@ -19,9 +19,7 @@ function GLOBAL<T extends keyof typeof GLOBALS>(
   return GLOBALS[state];
 }
 
-function customId() {
-  return GLOBAL("customId", (old) => old + 1);
-}
+const customId = () => GLOBAL("customId", (old) => old + 1);
 
 function convertElementToHTMLNMode<T extends Tag>(element: Stateless<T>) {
   function dfs(node: Stateless<Tag>, htmlNode: HTMLElement) {
@@ -54,7 +52,25 @@ function addProps(element: HTMLElement, props: object) {
   }
 }
 
-function getElementFromPath(path: number[]) {}
+function getElementFromPath(path: number[]) {
+  let node = document.body;
+  for (const i of path) {
+    node = node.childNodes[i] as HTMLElement;
+  }
+
+  return node;
+}
+
+function replaceHTMLElement(path: number[], element: HTMLElement) {
+  let node = document.body;
+  for (let i = 0; i < path.length - 1; i++) {
+    node = node.childNodes[path[i]] as HTMLElement;
+  }
+  node.replaceChild(
+    element,
+    node.childNodes[path[path.length - 1]] as HTMLElement
+  );
+}
 
 export {
   GLOBAL,
@@ -62,5 +78,6 @@ export {
   convertElementToHTMLNMode,
   customId,
   getElementFromPath,
+  replaceHTMLElement,
 };
 

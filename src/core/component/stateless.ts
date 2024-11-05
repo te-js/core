@@ -22,6 +22,9 @@ export class Stateless<T extends Tag> {
     function dfs(current: Stateless<T> | Stateful | any, path: number[]) {
       let child;
       if (current instanceof Stateful) {
+        current.path = path;
+        console.log(current, path);
+        
         child = current.build();
       } else if (current instanceof Stateless) {
         child = current;

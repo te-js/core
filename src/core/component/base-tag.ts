@@ -6,19 +6,28 @@ type BaseElement<T extends Tag> = Stateless<T> | Stateful | any;
 
 function baseComponent<T extends Tag>(
   tag: T,
-  props: IntrinsicAttributes<T>,
+  props: Partial<IntrinsicAttributes<T>>,
   ...children: BaseElement<T>[]
 ): Stateless<T> {
   return new Stateless(tag, props, ...children);
 }
+baseComponent("a", { class: "" });
 type ComponentBuilder = {
-  (props?: Stateless<Tag>["props"], ...children: BaseElement<Tag>[]): Stateless<Tag>;
+  (
+    props?: Stateless<Tag>["props"],
+    ...children: BaseElement<Tag>[]
+  ): Stateless<Tag>;
   (...children: BaseElement<Tag>[]): Stateless<Tag>;
 };
 const components = Object.fromEntries(
   htmlTags.map((tag) => [
     tag,
-    ((...args: any[]) => {
+    ((
+      ...args: (
+        | BaseElement<typeof tag>
+        | Partial<IntrinsicAttributes<typeof tag>>
+      )[]
+    ) => {
       if (args[0] instanceof Stateful || args[0] instanceof Stateless) {
         return baseComponent(tag, {}, ...args);
       } else if (typeof args[0] === "object") {
@@ -30,7 +39,7 @@ const components = Object.fromEntries(
     }) as ComponentBuilder,
   ])
 ) as Record<Tag, ComponentBuilder>;
-
+components.a({});
 export const {
   a,
   abbr,
