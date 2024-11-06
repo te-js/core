@@ -1,5 +1,6 @@
+import { Tag } from "../types";
 import Stateful from "./component/stateful";
-import Stateless from "./component/stateless";
+import Component from "./component/stateless";
 
 const GLOBALS = {
   component: 0,
@@ -21,10 +22,10 @@ function GLOBAL<T extends keyof typeof GLOBALS>(
 
 const customId = () => GLOBAL("customId", (old) => old + 1);
 
-function convertElementToHTMLNMode<T extends Tag>(element: Stateless<T>) {
-  function dfs(node: Stateless<Tag>, htmlNode: HTMLElement) {
+function convertElementToHTMLNMode<T extends Tag>(element: Component<T>) {
+  function dfs(node: Component<Tag>, htmlNode: HTMLElement) {
     for (let child of node.children) {
-      if (child instanceof Stateless) {
+      if (child instanceof Component) {
         const childNode = document.createElement(child.tag);
         addProps(childNode, child.props);
         dfs(child, childNode);

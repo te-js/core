@@ -1,5 +1,5 @@
 // Define ARIA attributes
-type AriaAttributes = {
+export type AriaAttributes = {
   "aria-activedescendant"?: string; // ID of the currently active descendant
   "aria-atomic"?: "true" | "false"; // Indicates whether assistive technologies should present the entire region or just the changed elements
   "aria-autocomplete"?: "none" | "inline" | "list" | "both"; // Indicates whether input completion suggestions are available
@@ -33,8 +33,6 @@ type AriaAttributes = {
   "aria-valuenow"?: number; // Defines the current value for a range widget
   "aria-valuetext"?: string; // Defines the text alternative for the current value of a range widget
 };
-
-type HTMLEvents<T extends Tag> = HTMLElementEventMap;
 
 type HtmlAttributes = {
   accept?: string; // file input types
@@ -173,62 +171,278 @@ type HtmlAttributes = {
 
 type ElementAttributes = {
   a: {
-    href: string; // Link to another document
-    target?: string; // Where to open the linked document
-    rel?: string; // Relationship with the linked document
-  } & HtmlAttributes; // Include all standard attributes
+    href: string;
+    target?: string;
+    rel?: string;
+  } & Partial<HtmlAttributes>;
 
   img: {
-    src: string; // Image source URL
-    alt?: string; // Alternative text
-    width?: number; // Image width
-    height?: number; // Image height
-  } & HtmlAttributes; // Include all standard attributes
+    src: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+  } & Partial<HtmlAttributes>;
 
   button: {
-    type?: "button" | "submit" | "reset"; // Button type
-    disabled?: boolean; // Disable button
-  } & HtmlAttributes; // Include all standard attributes
-
-  div: HtmlAttributes; // No specific attributes, just standard
-
-  span: HtmlAttributes; // No specific attributes, just standard
+    type?: "button" | "submit" | "reset";
+    disabled?: boolean;
+  } & Partial<HtmlAttributes>;
 
   input: {
-    type: string; // Type of the input (text, number, etc.)
-    value?: string; // Current value of the input
-    placeholder?: string; // Placeholder text
-    disabled?: boolean; // Disable input
-    required?: boolean; // Required input
-  } & HtmlAttributes; // Include all standard attributes
+    type: string;
+    value?: string;
+    placeholder?: string;
+    disabled?: boolean;
+    required?: boolean;
+  } & Partial<HtmlAttributes>;
 
   textarea: {
-    value?: string; // Current value of the textarea
-    rows?: number; // Number of visible text lines
-    cols?: number; // Number of visible character columns
-    placeholder?: string; // Placeholder text
-    disabled?: boolean; // Disable textarea
-    required?: boolean; // Required textarea
-  } & HtmlAttributes; // Include all standard attributes
+    value?: string;
+    rows?: number;
+    cols?: number;
+    placeholder?: string;
+    disabled?: boolean;
+    required?: boolean;
+  } & Partial<HtmlAttributes>;
 
   select: {
-    value?: string; // Current selected value
-    multiple?: boolean; // Allow multiple selections
-    disabled?: boolean; // Disable select
-  } & HtmlAttributes; // Include all standard attributes
+    value?: string;
+    multiple?: boolean;
+    disabled?: boolean;
+  } & Partial<HtmlAttributes>;
 
   form: {
-    action?: string; // URL for form submission
-    method?: "GET" | "POST"; // Form submission method
-    target?: string; // Where to send the form data
-  } & HtmlAttributes; // Include all standard attributes
+    action?: string;
+    method?: "GET" | "POST";
+    target?: string;
+  } & Partial<HtmlAttributes>;
 
-  // Add more elements as needed...
+  // Additional elements
+
+  div: Partial<HtmlAttributes>;
+  span: Partial<HtmlAttributes>;
+
+  h1: Partial<HtmlAttributes>;
+  h2: Partial<HtmlAttributes>;
+  h3: Partial<HtmlAttributes>;
+  h4: Partial<HtmlAttributes>;
+  h5: Partial<HtmlAttributes>;
+  h6: Partial<HtmlAttributes>;
+
+  p: Partial<HtmlAttributes>;
+  ul: Partial<HtmlAttributes>;
+  ol: Partial<HtmlAttributes>;
+  li: Partial<HtmlAttributes>;
+
+  table: Partial<HtmlAttributes>;
+  tr: Partial<HtmlAttributes>;
+  th: Partial<HtmlAttributes>;
+  td: Partial<HtmlAttributes>;
+  tbody: Partial<HtmlAttributes>;
+  thead: Partial<HtmlAttributes>;
+
+  // Additional embedded content elements
+  audio: {
+    src?: string;
+    controls?: boolean;
+  } & Partial<HtmlAttributes>;
+
+  video: {
+    src?: string;
+    controls?: boolean;
+    width?: number;
+    height?: number;
+  } & Partial<HtmlAttributes>;
+
+  // Miscellaneous elements
+  canvas: {
+    width?: number;
+    height?: number;
+  } & Partial<HtmlAttributes>;
+
+  script: {
+    src?: string;
+    type?: string;
+    async?: boolean;
+    defer?: boolean;
+  } & Partial<HtmlAttributes>;
+  object: Partial<HtmlAttributes>;
+  cite: Partial<HtmlAttributes>;
+  code: Partial<HtmlAttributes>;
+  label: Partial<HtmlAttributes>;
+  slot: Partial<HtmlAttributes>;
+  style: Partial<HtmlAttributes>;
+  summary: Partial<HtmlAttributes>;
+  title: Partial<HtmlAttributes>;
+  menu: Partial<HtmlAttributes>;
+  address: Partial<HtmlAttributes>;
+  abbr: Partial<HtmlAttributes>;
+  article: Partial<HtmlAttributes>;
+  aside: Partial<HtmlAttributes>;
+  b: Partial<HtmlAttributes>;
+  base: Partial<HtmlAttributes>;
+  bdi: Partial<HtmlAttributes>;
+  bdo: Partial<HtmlAttributes>;
+  blockquote: Partial<HtmlAttributes>;
+  body: Partial<HtmlAttributes>;
+  br: Partial<HtmlAttributes>;
+  caption: Partial<HtmlAttributes>;
+  col: Partial<HtmlAttributes>;
+  // Content sectioning elements
+  nav: Partial<HtmlAttributes>;
+  section: Partial<HtmlAttributes>;
+  header: Partial<HtmlAttributes>;
+  footer: Partial<HtmlAttributes>;
+  main: Partial<HtmlAttributes>;
+  figure: Partial<HtmlAttributes>;
+  figcaption: Partial<HtmlAttributes>;
+
+  // Inline text semantics
+  em: Partial<HtmlAttributes>;
+  strong: Partial<HtmlAttributes>;
+  small: Partial<HtmlAttributes>;
+  s: Partial<HtmlAttributes>;
+  q: Partial<HtmlAttributes>;
+  dfn: Partial<HtmlAttributes>;
+  samp: Partial<HtmlAttributes>;
+  kbd: Partial<HtmlAttributes>;
+  sup: Partial<HtmlAttributes>;
+  sub: Partial<HtmlAttributes>;
+  u: Partial<HtmlAttributes>;
+  mark: Partial<HtmlAttributes>;
+  ruby: Partial<HtmlAttributes>;
+  rt: Partial<HtmlAttributes>;
+  rp: Partial<HtmlAttributes>;
+
+  // Embedded content elements
+  iframe: {
+    src?: string;
+    width?: number;
+    height?: number;
+    sandbox?: string;
+  } & Partial<HtmlAttributes>;
+  embed: {
+    src: string;
+    type?: string;
+    width?: number;
+    height?: number;
+  } & Partial<HtmlAttributes>;
+  map: Partial<HtmlAttributes>;
+  area: {
+    alt: string;
+    coords: string;
+    href?: string;
+    target?: string;
+  } & Partial<HtmlAttributes>;
+
+  // Form-related elements
+  optgroup: {
+    label: string;
+    disabled?: boolean;
+  } & Partial<HtmlAttributes>;
+  option: {
+    value: string;
+    selected?: boolean;
+    disabled?: boolean;
+  } & Partial<HtmlAttributes>;
+  fieldset: {
+    disabled?: boolean;
+    form?: string;
+    name?: string;
+  } & Partial<HtmlAttributes>;
+  legend: Partial<HtmlAttributes>;
+
+  // Scripting
+  noscript: Partial<HtmlAttributes>;
+
+  // Structural/miscellaneous elements
+  details: {
+    open?: boolean;
+  } & Partial<HtmlAttributes>;
+  dialog: {
+    open?: boolean;
+  } & Partial<HtmlAttributes>;
+  colgroup: Partial<HtmlAttributes>;
+  data: {
+    value: string;
+  } & Partial<HtmlAttributes>;
+  datalist: Partial<HtmlAttributes>;
+  dd: Partial<HtmlAttributes>;
+  del: {
+    cite?: string;
+    datetime?: string;
+  } & Partial<HtmlAttributes>;
+  dl: Partial<HtmlAttributes>;
+  dt: Partial<HtmlAttributes>;
+  head: Partial<HtmlAttributes>;
+  hgroup: Partial<HtmlAttributes>;
+  hr: Partial<HtmlAttributes>;
+  html: Partial<HtmlAttributes>;
+  i: Partial<HtmlAttributes>;
+  ins: {
+    cite?: string;
+    datetime?: string;
+  } & Partial<HtmlAttributes>;
+  link: {
+    href: string;
+    rel: string;
+    type?: string;
+    media?: string;
+    integrity?: string;
+    crossorigin?: "anonymous" | "use-credentials";
+  } & Partial<HtmlAttributes>;
+  meta: {
+    name?: string;
+    content?: string;
+    charset?: string;
+    "http-equiv"?: string;
+  } & Partial<HtmlAttributes>;
+  meter: {
+    value: number;
+    min?: number;
+    max?: number;
+    low?: number;
+    high?: number;
+    optimum?: number;
+  } & Partial<HtmlAttributes>;
+  output: {
+    for?: string;
+    form?: string;
+    name?: string;
+  } & Partial<HtmlAttributes>;
+  picture: Partial<HtmlAttributes>;
+  pre: Partial<HtmlAttributes>;
+  progress: {
+    value?: number;
+    max?: number;
+  } & Partial<HtmlAttributes>;
+  source: {
+    src?: string;
+    type?: string;
+    srcset?: string;
+    sizes?: string;
+    media?: string;
+  } & Partial<HtmlAttributes>;
+  template: Partial<HtmlAttributes>;
+  track: {
+    kind?: "subtitles" | "captions" | "descriptions" | "chapters" | "metadata";
+    src: string;
+    srclang?: string;
+    label?: string;
+    default?: boolean;
+  } & Partial<HtmlAttributes>;
+  wbr: Partial<HtmlAttributes>;
+  search: Partial<HtmlAttributes>;
+  tfoot: Partial<HtmlAttributes>;
+  time: {
+    datetime?: string;
+  } & Partial<HtmlAttributes>;
+  var: Partial<HtmlAttributes>;
+} & {
+  [K in Tag]?: Partial<HtmlAttributes>;
 };
 
-type Merge<T1, T2> = T1 & T2;
+export type Tag = keyof HTMLElementTagNameMap;
 
-type IntrinsicAttributes<T extends Tag> = AriaAttributes &
-  HtmlAttributes &
+export type IntrinsicAttributes<T extends Tag> = AriaAttributes &
   ElementAttributes[T];
-  // HTMLEvents<T>

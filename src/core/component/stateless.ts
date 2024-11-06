@@ -1,16 +1,17 @@
+import { IntrinsicAttributes, Tag } from "../../types";
 import { customId } from "../utils";
-import { default as Component, default as Stateful } from "./stateful";
+import { Stateful } from "./stateful";
 
-export class Stateless<T extends Tag> {
+class Component<T extends Tag> {
   tag: T;
   id: string;
   path: number[];
-  children: (Stateless<Tag> | Component | any)[];
-  props: Partial<IntrinsicAttributes<T>>;
+  children: (Component<Tag> | Stateful | any)[];
+  props: IntrinsicAttributes<T>;
   constructor(
     tag: T,
-    props: Partial<IntrinsicAttributes<T>>,
-    ...children: (Stateless<Tag> | Component | any)[]
+    props: IntrinsicAttributes<T>,
+    ...children: (Component<Tag> | Stateful | any)[]
   ) {
     this.tag = tag;
     this.id = customId().toString();
@@ -19,14 +20,14 @@ export class Stateless<T extends Tag> {
     this.children = children;
   }
   public setPath() {
-    function dfs(current: Stateless<T> | Stateful | any, path: number[]) {
+    function dfs(current: Component<T> | Stateful | any, path: number[]) {
       let child;
       if (current instanceof Stateful) {
         current.path = path;
         console.log(current, path);
-        
+
         child = current.build();
-      } else if (current instanceof Stateless) {
+      } else if (current instanceof Component) {
         child = current;
       } else return;
       child!.path = path;
@@ -38,4 +39,4 @@ export class Stateless<T extends Tag> {
   }
 }
 
-export default Stateless;
+export { Component };

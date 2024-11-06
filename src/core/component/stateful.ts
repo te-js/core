@@ -1,6 +1,7 @@
+import { Tag } from "../../types";
 import { convertElementToHTMLNMode, replaceHTMLElement } from "../utils";
 import { sealed } from "./decorators";
-import { Stateless } from "./stateless";
+import { Component } from "./stateless";
 
 abstract class Stateful {
   private _path: number[] = [];
@@ -29,7 +30,7 @@ abstract class Stateful {
   public refresh() {
     replaceHTMLElement(this._path, convertElementToHTMLNMode(this.build()));
   }
-  public abstract build(): Stateless<Tag>;
+  public abstract build(): Component<Tag>;
 }
 
-export default Stateful;
+export { Stateful };

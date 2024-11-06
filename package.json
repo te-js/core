@@ -16,5 +16,10 @@
   "dependencies": {
     "express": "^4.21.1",
     "vite-plugin-ssr": "^0.4.142"
-  }
+  },
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

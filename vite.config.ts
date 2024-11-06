@@ -1,3 +1,4 @@
+import path from "path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
@@ -7,5 +8,13 @@ export default defineConfig({
     port: 3000,
     open: false,
     proxy: {},
+  },
+  build: {
+    lib: {
+      entry: path.resolve(__dirname, "src/index.ts"),
+      name: "tee",
+      formats: ["es", "umd"],
+      fileName: (format) => `tee.${format}.js`,
+    },
   },
 });

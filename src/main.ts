@@ -1,6 +1,4 @@
-import { a, button, div, h1, main, p } from "./core";
-import Stateful from "./core/component/stateful";
-import run from "./core/run";
+import { a, button, div, h1, main, p, route, Stateful } from "./index";
 
 class Main extends Stateful {
   async init() {
@@ -18,7 +16,7 @@ class Test extends Stateful {
   result: any[] = [];
   build() {
     return div(
-      a({ href: "/asdfasdfasdf" }, "Google"),
+      a({ href: "/about" }, "Google"),
       div(
         h1(
           {
@@ -43,4 +41,7 @@ class Test extends Stateful {
   }
 }
 
-run(new Main());
+route({
+  "/": () => new Main(),
+  "/about": () => new Test(),
+});

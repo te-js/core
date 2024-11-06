@@ -1,34 +1,32 @@
+import { IntrinsicAttributes, Tag } from "../../types";
 import { htmlTags } from "../tags";
 import Stateful from "./stateful";
-import Stateless from "./stateless";
+import Component from "./stateless";
 
-type BaseElement<T extends Tag> = Stateless<T> | Stateful | any;
+type BaseElement<T extends Tag> = Component<T> | Stateful | any;
 
 function baseComponent<T extends Tag>(
   tag: T,
-  props: Partial<IntrinsicAttributes<T>>,
+  props: IntrinsicAttributes<T>,
   ...children: BaseElement<T>[]
-): Stateless<T> {
-  return new Stateless(tag, props, ...children);
+): Component<T> {
+  return new Component(tag, props, ...children);
 }
-baseComponent("a", { class: "" });
+
 type ComponentBuilder = {
   (
-    props?: Stateless<Tag>["props"],
+    props?: Component<Tag>["props"],
     ...children: BaseElement<Tag>[]
-  ): Stateless<Tag>;
-  (...children: BaseElement<Tag>[]): Stateless<Tag>;
+  ): Component<Tag>;
+  (...children: BaseElement<Tag>[]): Component<Tag>;
 };
 const components = Object.fromEntries(
   htmlTags.map((tag) => [
     tag,
     ((
-      ...args: (
-        | BaseElement<typeof tag>
-        | Partial<IntrinsicAttributes<typeof tag>>
-      )[]
+      ...args: (BaseElement<typeof tag> | IntrinsicAttributes<typeof tag>)[]
     ) => {
-      if (args[0] instanceof Stateful || args[0] instanceof Stateless) {
+      if (args[0] instanceof Stateful || args[0] instanceof Component) {
         return baseComponent(tag, {}, ...args);
       } else if (typeof args[0] === "object") {
         const [props = {}, ...children] = args;
@@ -39,7 +37,7 @@ const components = Object.fromEntries(
     }) as ComponentBuilder,
   ])
 ) as Record<Tag, ComponentBuilder>;
-components.a({});
+
 export const {
   a,
   abbr,

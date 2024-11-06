@@ -1,4 +1,6 @@
-const htmlTags: Tag[] = [
+import { Tag } from "../types";
+
+const htmlTags: readonly Tag[] = [
   // Document Metadata
   "html",
   "head",
@@ -147,23 +149,6 @@ const htmlTags: Tag[] = [
   // Miscellaneous
   "template",
   "slot",
-];
-const selfClosingTags: Set<string> = new Set([
-  "area",
-  "base",
-  "br",
-  "col",
-  "embed",
-  "hr",
-  "img",
-  "input",
-  "keygen",
-  "link",
-  "meta",
-  "param",
-  "source",
-  "track",
-  "wbr",
-]);
+] as const;
 
-export { htmlTags, selfClosingTags };
+export { htmlTags };
