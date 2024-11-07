@@ -1,7 +1,6 @@
-import { IntrinsicAttributes, Tag } from "../../types";
 import { htmlTags } from "../tags";
-import Stateful from "./stateful";
-import Component from "./stateless";
+import { Stateful } from "./stateful";
+import { Component } from "./stateless";
 
 type BaseElement<T extends Tag> = Component<T> | Stateful | any;
 

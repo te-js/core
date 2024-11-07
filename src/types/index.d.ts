@@ -1,37 +1,37 @@
-// Define ARIA attributes
-export type AriaAttributes = {
-  "aria-activedescendant"?: string; // ID of the currently active descendant
-  "aria-atomic"?: "true" | "false"; // Indicates whether assistive technologies should present the entire region or just the changed elements
-  "aria-autocomplete"?: "none" | "inline" | "list" | "both"; // Indicates whether input completion suggestions are available
-  "aria-busy"?: "true" | "false"; // Indicates whether the element is currently being updated
-  "aria-checked"?: "true" | "false" | "mixed"; // Indicates the current "checked" state of checkboxes and radio buttons
-  "aria-controls"?: string; // ID of the element that controls the current element
-  "aria-describedby"?: string; // ID of the element that describes the current element
-  "aria-disabled"?: "true" | "false"; // Indicates that the element is perceivable but disabled
-  "aria-expanded"?: "true" | "false"; // Indicates whether an element is expanded or collapsed
-  "aria-haspopup"?: "true" | "false" | "menu" | "listbox" | "tree" | "grid"; // Indicates the presence of a popup element
-  "aria-hidden"?: "true" | "false"; // Indicates whether an element is visible or not
-  "aria-invalid"?: "true" | "false" | "grammar" | "spelling"; // Indicates the validation state of an element
-  "aria-label"?: string; // Defines a string value that labels the current element
-  "aria-labelledby"?: string; // ID of the element that labels the current element
-  "aria-level"?: number; // Defines the hierarchical level of an element
-  "aria-live"?: "off" | "polite" | "assertive"; // Indicates that an element will be updated and describes the type of updates
-  "aria-modal"?: "true" | "false"; // Indicates whether an element is modal
-  "aria-multiselectable"?: "true" | "false"; // Indicates whether a listbox allows multiple items to be selected
-  "aria-orientation"?: "horizontal" | "vertical"; // Defines the orientation of a user interface element
-  "aria-placeholder"?: string; // Provides a placeholder for user input
-  "aria-pressed"?: "true" | "false" | "mixed"; // Indicates the current "pressed" state of toggle buttons
-  "aria-readonly"?: "true" | "false"; // Indicates that the element is not editable
-  "aria-relevant"?: "additions" | "removals" | "text"; // Indicates what notifications the user agent should deliver to the user
-  "aria-required"?: "true" | "false"; // Indicates that user input is required on the element
-  "aria-roledescription"?: string; // Defines a human-readable description for the role of an element
-  "aria-selected"?: "true" | "false"; // Indicates the current "selected" state of elements
-  "aria-setsize"?: number; // Defines the number of items in a set of related elements
-  "aria-sort"?: "ascending" | "descending" | "none"; // Indicates that the element is sorted in a certain order
-  "aria-valuemax"?: number; // Defines the maximum allowed value for a range widget
-  "aria-valuemin"?: number; // Defines the minimum allowed value for a range widget
-  "aria-valuenow"?: number; // Defines the current value for a range widget
-  "aria-valuetext"?: string; // Defines the text alternative for the current value of a range widget
+// declare global {
+type AriaAttributes = {
+  "aria-activedescendant"?: string;
+  "aria-atomic"?: "true" | "false";
+  "aria-autocomplete"?: "none" | "inline" | "list" | "both";
+  "aria-busy"?: "true" | "false";
+  "aria-checked"?: "true" | "false" | "mixed";
+  "aria-controls"?: string;
+  "aria-describedby"?: string;
+  "aria-disabled"?: "true" | "false";
+  "aria-expanded"?: "true" | "false";
+  "aria-haspopup"?: "true" | "false" | "menu" | "listbox" | "tree" | "grid";
+  "aria-hidden"?: "true" | "false";
+  "aria-invalid"?: "true" | "false" | "grammar" | "spelling";
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-level"?: number;
+  "aria-live"?: "off" | "polite" | "assertive";
+  "aria-modal"?: "true" | "false";
+  "aria-multiselectable"?: "true" | "false";
+  "aria-orientation"?: "horizontal" | "vertical";
+  "aria-placeholder"?: string;
+  "aria-pressed"?: "true" | "false" | "mixed";
+  "aria-readonly"?: "true" | "false";
+  "aria-relevant"?: "additions" | "removals" | "text";
+  "aria-required"?: "true" | "false";
+  "aria-roledescription"?: string;
+  "aria-selected"?: "true" | "false";
+  "aria-setsize"?: number;
+  "aria-sort"?: "ascending" | "descending" | "none";
+  "aria-valuemax"?: number;
+  "aria-valuemin"?: number;
+  "aria-valuenow"?: number;
+  "aria-valuetext"?: string;
 };
 
 type HtmlAttributes = {
@@ -442,7 +442,8 @@ type ElementAttributes = {
   [K in Tag]?: Partial<HtmlAttributes>;
 };
 
-export type Tag = keyof HTMLElementTagNameMap;
+type Tag = keyof HTMLElementTagNameMap;
 
-export type IntrinsicAttributes<T extends Tag> = AriaAttributes &
-  ElementAttributes[T];
+type IntrinsicAttributes<T extends Tag> = AriaAttributes & ElementAttributes[T];
+// }
+// export type { IntrinsicAttributes, Tag };

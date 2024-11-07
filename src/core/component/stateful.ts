@@ -1,4 +1,4 @@
-import { Tag } from "../../types";
+// import { Tag } from "../../types";
 import { convertElementToHTMLNMode, replaceHTMLElement } from "../utils";
 import { sealed } from "./decorators";
 import { Component } from "./stateless";

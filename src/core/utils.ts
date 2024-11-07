@@ -1,6 +1,5 @@
-import { Tag } from "../types";
-import Stateful from "./component/stateful";
-import Component from "./component/stateless";
+import { Stateful } from "./component/stateful.js";
+import { Component } from "./component/stateless.js";
 
 const GLOBALS = {
   component: 0,
@@ -74,11 +73,10 @@ function replaceHTMLElement(path: number[], element: HTMLElement) {
 }
 
 export {
-  GLOBAL,
-  TODO,
   convertElementToHTMLNMode,
   customId,
   getElementFromPath,
+  GLOBAL,
   replaceHTMLElement,
+  TODO,
 };
-

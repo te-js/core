@@ -3,21 +3,29 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "dist/tee.cjs.js",
+  "module": "dist/tee.es.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "dev:build": "vite build && tsc --emitDeclarationOnly",
     "preview": "vite preview"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
+    "rollup-plugin-dts": "^6.1.1",
     "typescript": "~5.6.2",
-    "vite": "^5.4.10"
+    "vite": "^5.4.10",
+    "vite-plugin-dts": "^4.3.0"
   },
   "dependencies": {
     "express": "^4.21.1",
     "vite-plugin-ssr": "^0.4.142"
   },
-  "main": "index.js",
   "keywords": [],
   "author": "",
   "license": "ISC",

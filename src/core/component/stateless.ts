@@ -1,4 +1,4 @@
-import { IntrinsicAttributes, Tag } from "../../types";
+// import { IntrinsicAttributes, Tag } from "../../types";
 import { customId } from "../utils";
 import { Stateful } from "./stateful";
 

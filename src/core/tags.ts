@@ -1,4 +1,4 @@
-import { Tag } from "../types";
+// import { Tag } from "../types";
 
 const htmlTags: readonly Tag[] = [
   // Document Metadata

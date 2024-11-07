@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
+    "target": "ESNext",
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
+    "outDir": "dist",
+    "declaration": true,
+    "declarationDir": "dist/types",
+    "emitDeclarationOnly": true,
 
     /* Bundler mode */
     "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true,
     "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
+    "moduleDetection": "auto",
 
     /* Linting */
     "strict": true,
@@ -20,5 +21,6 @@
     "noFallthroughCasesInSwitch": true,
     "experimentalDecorators": true
   },
-  "include": ["src"]
+  "include": ["src", "src/types/index.d.ts"],
+  "exclude": ["dist", "node_modules"]
 }
