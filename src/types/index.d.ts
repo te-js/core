@@ -35,6 +35,9 @@ type AriaAttributes = {
 };
 
 type HtmlAttributes = {
+  // Custom props
+  cache?: boolean;
+  ref?: HTMLElement;
   accept?: string; // file input types
   "accept-charset"?: string; // form character set
   accesskey?: string; // accessibility keyboard shortcuts

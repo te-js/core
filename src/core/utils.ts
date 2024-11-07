@@ -1,10 +1,14 @@
 import { Stateful } from "./component/stateful.js";
 import { Component } from "./component/stateless.js";
+import { Reference } from "./reference.js";
 
 const GLOBALS = {
   component: 0,
   customId: 0,
+  cached: new Map<number[], Component<Tag> | Stateful>(),
+  currentPath: <number[]>[],
 };
+const customProps = new Set(["ref", "cache"]);
 const TODO = new Error("TODO");
 function GLOBAL<T extends keyof typeof GLOBALS>(
   state: T,
@@ -22,18 +26,33 @@ function GLOBAL<T extends keyof typeof GLOBALS>(
 const customId = () => GLOBAL("customId", (old) => old + 1);
 
 function convertElementToHTMLNMode<T extends Tag>(element: Component<T>) {
-  function dfs(node: Component<Tag>, htmlNode: HTMLElement) {
-    for (let child of node.children) {
+  async function dfs(
+    node: Component<Tag>,
+    htmlNode: HTMLElement,
+    path: number[]
+  ) {
+    for (let i = 0; i < node.children.length; i++) {
+      const newPath = [...path, i];
+
+      const child = node.children[i];
+      if (GLOBAL("cached").has(newPath)) {
+        console.log("cached");
+        let element = GLOBAL("cached").get(newPath);
+        if (!element) throw new Error("Bad state. no element");
+        while (element instanceof Stateful) element = await element.build();
+        htmlNode.appendChild(document.createElement(element!.tag));
+        continue;
+      }
       if (child instanceof Component) {
         const childNode = document.createElement(child.tag);
-        addProps(childNode, child.props);
-        dfs(child, childNode);
+        addProps(newPath, childNode, child.props);
+        dfs(child, childNode, newPath);
         htmlNode.appendChild(childNode);
       } else if (child instanceof Stateful) {
-        const build = child.build();
+        const build = await child.build();
         const childNode = document.createElement(build.tag);
-        addProps(childNode, build.props);
-        dfs(build, childNode);
+        addProps(newPath, childNode, build.props);
+        dfs(build, childNode, newPath);
         htmlNode.appendChild(childNode);
       } else {
         htmlNode.append(child);
@@ -41,13 +60,36 @@ function convertElementToHTMLNMode<T extends Tag>(element: Component<T>) {
     }
   }
   const root = document.createElement(element.tag);
-  dfs(element, root);
+  dfs(element, root, []);
   return root;
 }
 
-function addProps(element: HTMLElement, props: object) {
+function addProps(
+  path: number[],
+  element: HTMLElement,
+  props: Record<string, any>
+) {
   for (const [key, value] of Object.entries(props)) {
-    if (key.startsWith("on")) element.addEventListener(key.slice(2), value);
+    if (customProps.has(key)) {
+      switch (key) {
+        case "ref":
+          const ref = (props as any)["ref"];
+          if (ref instanceof Reference) {
+            ref.target = element;
+          }
+          (props as any)["ref"] = element;
+          break;
+        case "cache":
+          if (!GLOBAL("cached").has(path)) {
+            console.log("to cache", element);
+
+            // GLOBAL("cached").set(path, element);
+          }
+
+          break;
+      }
+    } else if (key.startsWith("on"))
+      element.addEventListener(key.slice(2), value);
     else element.setAttribute(key, value);
   }
 }
@@ -66,6 +108,7 @@ function replaceHTMLElement(path: number[], element: HTMLElement) {
   for (let i = 0; i < path.length - 1; i++) {
     node = node.childNodes[path[i]] as HTMLElement;
   }
+
   node.replaceChild(
     element,
     node.childNodes[path[path.length - 1]] as HTMLElement
@@ -80,3 +123,4 @@ export {
   replaceHTMLElement,
   TODO,
 };
+

@@ -20,13 +20,14 @@ class Component<T extends Tag> {
     this.children = children;
   }
   public setPath() {
-    function dfs(current: Component<T> | Stateful | any, path: number[]) {
+    async function dfs(current: Component<T> | Stateful | any, path: number[]) {
       let child;
       if (current instanceof Stateful) {
         current.path = path;
-        console.log(current, path);
-
-        child = current.build();
+        child = await current.build();
+        while (child instanceof Stateful) {
+          child = await child.build();
+        }
       } else if (current instanceof Component) {
         child = current;
       } else return;
@@ -40,3 +41,4 @@ class Component<T extends Tag> {
 }
 
 export { Component };
+

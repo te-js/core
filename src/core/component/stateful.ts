@@ -1,7 +1,13 @@
 // import { Tag } from "../../types";
+import { Reference } from "../reference";
 import { convertElementToHTMLNMode, replaceHTMLElement } from "../utils";
 import { sealed } from "./decorators";
 import { Component } from "./stateless";
+
+type ProxyRef<T> = T extends object ? T : { value: T };
+interface StateOptions {
+  searchParams?: boolean;
+}
 
 abstract class Stateful {
   private _path: number[] = [];
@@ -22,15 +28,39 @@ abstract class Stateful {
     this.path = path;
   }
 
+  public state<T>(value: T, options?: StateOptions) {
+    return new Proxy<ProxyRef<T>>(
+      (typeof value === "object" ? value : { value }) as ProxyRef<T>,
+      {
+        set: (target: ProxyRef<T>, p: string | symbol, newValue: any) => {
+          const res = Reflect.set(target, p, newValue);
+          if (options?.searchParams) {
+            window.location.search;
+          }
+          this.refresh();
+          return res;
+        },
+      }
+    );
+  }
+
+  public ref() {
+    return new Reference(null);
+  }
+
   @sealed
   public set(callback: () => void) {
     callback();
     this.refresh();
   }
-  public refresh() {
-    replaceHTMLElement(this._path, convertElementToHTMLNMode(this.build()));
+  public async refresh() {
+    replaceHTMLElement(
+      this._path,
+      convertElementToHTMLNMode(await this.build())
+    );
   }
-  public abstract build(): Component<Tag>;
+  public abstract build(): Component<Tag> | Promise<Component<Tag>>;
 }
 
 export { Stateful };
+

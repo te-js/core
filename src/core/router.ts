@@ -1,14 +1,21 @@
 import { Stateful } from "./component/stateful";
 import { convertElementToHTMLNMode } from "./utils";
 
-function render(page: Stateful) {
+async function render(page: Stateful) {
   page.path = [0];
-  const element = page.build();
+  const element = await page.build();
   element.path = [0];
   element.setPath();
   const root = convertElementToHTMLNMode(element);
   document.body.innerHTML = "";
   document.body.appendChild(root);
+}
+
+function getRoute(
+  paths: Record<string, (...params: any[]) => Stateful>,
+  location: string
+) {
+  const locations = location.split("/");
 }
 
 const route = (paths: Record<string, (...params: any[]) => Stateful>) => {
@@ -18,7 +25,18 @@ const route = (paths: Record<string, (...params: any[]) => Stateful>) => {
     },
     set(target, p, newValue, receiver) {
       if (p === "pathname") {
+        console.log("ROUTE", newValue);
+
         history.pushState({}, "", newValue);
+        const locations = newValue.split("/");
+
+        for (const location of locations) {
+          if (location === "") continue;
+          if (location in paths) {
+            render(paths[location]());
+          }
+        }
+
         if (newValue in paths) {
           render(paths[newValue]());
         }
@@ -32,3 +50,4 @@ const route = (paths: Record<string, (...params: any[]) => Stateful>) => {
 };
 
 export { route };
+
