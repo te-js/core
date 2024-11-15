@@ -1,7 +1,6 @@
 // import { Tag } from "../../types";
 import { Reference } from "../reference";
 import { convertElementToHTMLNMode, replaceHTMLElement } from "../utils";
-import { sealed } from "./decorators";
 import { Component } from "./stateless";
 
 type ProxyRef<T> = T extends object ? T : { value: T };
@@ -23,7 +22,7 @@ abstract class Stateful {
     this.init();
   }
 
-  @sealed
+  // @sealed
   public setPath(path: number[]) {
     this.path = path;
   }
@@ -48,7 +47,7 @@ abstract class Stateful {
     return new Reference(null);
   }
 
-  @sealed
+  // @sealed
   public set(callback: () => void) {
     callback();
     this.refresh();
