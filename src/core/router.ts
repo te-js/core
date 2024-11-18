@@ -11,12 +11,12 @@ async function render(page: Stateful) {
   document.body.appendChild(root);
 }
 
-function getRoute(
-  paths: Record<string, (...params: any[]) => Stateful>,
-  location: string
-) {
-  const locations = location.split("/");
-}
+// function getRoute(
+//   paths: Record<string, (...params: any[]) => Stateful>,
+//   location: string
+// ) {
+//   const locations = location.split("/");
+// }
 
 const route = (paths: Record<string, (...params: any[]) => Stateful>) => {
   const router = new Proxy(window.location, {
@@ -50,4 +50,3 @@ const route = (paths: Record<string, (...params: any[]) => Stateful>) => {
 };
 
 export { route };
-
