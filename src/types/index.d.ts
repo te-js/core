@@ -1,4 +1,3 @@
-// declare global {
 type AriaAttributes = {
   "aria-activedescendant"?: string;
   "aria-atomic"?: "true" | "false";
@@ -444,9 +443,16 @@ type ElementAttributes = {
 } & {
   [K in Tag]?: Partial<HtmlAttributes>;
 };
-
+type HtmlEvents = {
+  [K in keyof HTMLElementEventMap as `on${K}`]?: (
+    ev: HTMLElementEventMap[K]
+  ) => void;
+};
+// Capitalize<string & K>
 type Tag = keyof HTMLElementTagNameMap;
 
-type IntrinsicAttributes<T extends Tag> = AriaAttributes & ElementAttributes[T];
-// }
-// export type { IntrinsicAttributes, Tag };
+type IntrinsicAttributes<T extends Tag> = AriaAttributes &
+  ElementAttributes[T] &
+  HtmlEvents;
+
+type BaseTypes = string | number | boolean;

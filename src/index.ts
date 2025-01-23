@@ -1,5 +1,4 @@
+export * from "./core/component/base-component";
 export * from "./core/component/base-tag";
-export * from "./core/component/stateful";
-export * from "./core/component/stateless";
-export * from "./core/router";
-
+export * from "./core/component/component";
+export * from "./core/route";

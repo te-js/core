@@ -1,12 +1,13 @@
-import { Stateful } from "./component/stateful.js";
-import { Component } from "./component/stateless.js";
+import { BaseComponent } from "./component/base-component.js";
+import { DefaultComponent } from "./component/component.js";
 import { Reference } from "./reference.js";
 
 const GLOBALS = {
   component: 0,
   customId: 0,
-  cached: new Map<number[], Component<Tag> | Stateful>(),
+  cached: new Map<number[], BaseComponent<Tag> | DefaultComponent>(),
   currentPath: <number[]>[],
+  pages: new Map<string, typeof DefaultComponent>(),
 };
 const customProps = new Set(["ref", "cache"]);
 const TODO = new Error("TODO");
@@ -25,9 +26,9 @@ function GLOBAL<T extends keyof typeof GLOBALS>(
 
 const customId = () => GLOBAL("customId", (old) => old + 1);
 
-function convertElementToHTMLNMode<T extends Tag>(element: Component<T>) {
+function convertElementToHTMLNMode<T extends Tag>(element: BaseComponent<T>) {
   async function dfs(
-    node: Component<Tag>,
+    node: BaseComponent<Tag>,
     htmlNode: HTMLElement,
     path: number[]
   ) {
@@ -39,23 +40,25 @@ function convertElementToHTMLNMode<T extends Tag>(element: Component<T>) {
         console.log("cached");
         let element = GLOBAL("cached").get(newPath);
         if (!element) throw new Error("Bad state. no element");
-        while (element instanceof Stateful) element = await element.build();
+        while (element instanceof DefaultComponent)
+          element = await element.build();
         htmlNode.appendChild(document.createElement(element!.tag));
         continue;
       }
-      if (child instanceof Component) {
+      if (child instanceof BaseComponent) {
         const childNode = document.createElement(child.tag);
         addProps(newPath, childNode, child.props);
         dfs(child, childNode, newPath);
         htmlNode.appendChild(childNode);
-      } else if (child instanceof Stateful) {
-        const build = await child.build();
+      } else if (child instanceof DefaultComponent) {
+        const build = await child.flat();
         const childNode = document.createElement(build.tag);
         addProps(newPath, childNode, build.props);
         dfs(build, childNode, newPath);
         htmlNode.appendChild(childNode);
       } else {
-        htmlNode.append(child);
+        if (typeof child === "object") htmlNode.append(JSON.stringify(child));
+        else htmlNode.append(String(child));
       }
     }
   }
@@ -85,12 +88,12 @@ function addProps(
 
             // GLOBAL("cached").set(path, element);
           }
-
           break;
       }
-    } else if (key.startsWith("on"))
-      element.addEventListener(key.slice(2), value);
-    else element.setAttribute(key, value);
+    } else if (key.startsWith("on")) {
+      // console.log(key.slice(2).toLowerCase(), value);
+      element.addEventListener(key.slice(2).toLowerCase(), value);
+    } else element.setAttribute(key, value);
   }
 }
 
@@ -123,4 +126,3 @@ export {
   replaceHTMLElement,
   TODO,
 };
-

@@ -1,7 +1,6 @@
+export * from "./component/base-component";
 export * from "./component/base-tag";
-export * from "./component/stateful";
-export * from "./component/stateless";
+export * from "./component/component";
 // export * from './render'
 // export * from './state'
 export * from "./tags";
-

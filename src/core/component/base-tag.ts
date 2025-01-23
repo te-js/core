@@ -1,41 +1,47 @@
 import { htmlTags } from "../tags";
-import { Stateful } from "./stateful";
-import { Component } from "./stateless";
+import { BaseComponent } from "./base-component";
+import { DefaultComponent } from "./component";
+import Component from "./default/default-component";
 
-type BaseElement<T extends Tag> = Component<T> | Stateful | any;
+type BaseElement<T extends Tag> =
+  | BaseComponent<T>
+  | DefaultComponent
+  | BaseTypes;
 
-function baseComponent<T extends Tag>(
+export function $<T extends Tag>(
   tag: T,
   props: IntrinsicAttributes<T>,
   ...children: BaseElement<T>[]
-): Component<T> {
-  return new Component(tag, props, ...children);
+): BaseComponent<T> {
+  return new BaseComponent<T>(tag, props, ...children);
 }
 
-type ComponentBuilder = {
+type BaseComponentBuilder = {
   (
-    props?: Component<Tag>["props"],
+    props?: BaseComponent<Tag>["props"],
     ...children: BaseElement<Tag>[]
-  ): Component<Tag>;
-  (...children: BaseElement<Tag>[]): Component<Tag>;
+  ): BaseComponent<Tag>;
+  (...children: BaseElement<Tag>[]): BaseComponent<Tag>;
 };
 const components = Object.fromEntries(
   htmlTags.map((tag) => [
     tag,
-    ((
-      ...args: (BaseElement<typeof tag> | IntrinsicAttributes<typeof tag>)[]
-    ) => {
-      if (args[0] instanceof Stateful || args[0] instanceof Component) {
-        return baseComponent(tag, {}, ...args);
+    (<T extends Tag>(...args: (BaseElement<T> | IntrinsicAttributes<T>)[]) => {
+      if (
+        args[0] instanceof DefaultComponent ||
+        args[0] instanceof BaseComponent ||
+        args[0] instanceof Component
+      ) {
+        return $(tag, {}, ...(args as BaseElement<T>[]));
       } else if (typeof args[0] === "object") {
         const [props = {}, ...children] = args;
-        return baseComponent(tag, { ...props }, ...children);
+        return $(tag, { ...props }, ...(children as BaseElement<T>[]));
       } else {
-        return baseComponent(tag, {}, ...args);
+        return $(tag, {}, ...(args as BaseElement<T>[]));
       }
-    }) as ComponentBuilder,
+    }) as BaseComponentBuilder,
   ])
-) as Record<Tag, ComponentBuilder>;
+) as Record<Tag, BaseComponentBuilder>;
 
 export const {
   a,
