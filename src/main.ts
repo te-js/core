@@ -16,7 +16,9 @@ import {
 @page("/")
 class Main extends DefaultComponent {
   build() {
-    return main(div(p("ciao mondo"), h1("example counter"), new Test()));
+    return main(
+      div(p({ class: "" }, "ciao mondo"), h1("example counter"), new Test())
+    );
   }
 }
 
