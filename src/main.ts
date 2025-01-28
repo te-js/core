@@ -1,7 +1,6 @@
 import { page } from "./core/component/decorators";
+import Store from "./core/state-management";
 import {
-  $,
-  a,
   BaseComponent,
   button,
   DefaultComponent,
@@ -12,42 +11,74 @@ import {
   p,
   route,
 } from "./index";
+const store = new Store(
+  { value: 0 },
+  {
+    increment: (value) => {
+      value.value++;
+      return value;
+    },
+    decrement: (value) => {
+      value.value--;
+      return value;
+    },
+  }
+);
 
 @page("/")
 class Main extends DefaultComponent {
   build() {
+    const value = store.watch(this);
     return main(
-      div(p({ class: "" }, "ciao mondo"), h1("example counter"), new Test())
+      div(
+        p({ class: "prova" }, `ciao mondo ${value.value}`),
+        h1("example counter"),
+        button({ onclick: () => this.modifyStore() }, "Increment"),
+        new Test()
+      )
     );
+  }
+  modifyStore() {
+    store.write("increment");
   }
 }
 
 @page("/about")
 class Test extends DefaultComponent {
   counter = this.state(0);
+  testo = this.state("");
   loading = false;
   result: any[] = [];
   build() {
     return div(
-      a({ href: "/about" }, "Google"),
       div(
-        $("a", { href: "" }),
         h1(
           {
             class: "prova",
           },
-          `ciao ${this.counter.value}`,
-          ...(this.result.map((e) => p(e["id"])) || "no data")
+          `ciao ${this.counter.value}`
         ),
-        a({ href: "" }, ""),
-        this.loading && h1("Loading..."),
-        button({ class: "counter", onclick: this.onclick.bind(this) }, "+ 1")
+        input({
+          type: "text",
+          class: "bg-red",
+          onchange: (e: Event) => {
+            // this.counter.value = (e.target as HTMLInputElement).value;
+            console.log((e.target as HTMLInputElement).value);
+            this.testo.value = (e.target as HTMLInputElement).value;
+          },
+        }),
+        button({ class: "counter", onclick: this.onclick.bind(this) }, "+ 1"),
+        button({ class: "counter", onclick: this.decrease.bind(this) }, "- 1")
       ),
+      p({}, this.testo.value),
       div({ class: "container" }, ...boxes(this.counter.value))
     );
   }
   async onclick() {
     this.counter.value += 1;
+  }
+  decrease() {
+    this.counter.value--;
   }
 }
 

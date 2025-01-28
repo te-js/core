@@ -1,7 +1,8 @@
 // import { Tag } from "../../types";
 import { Reference } from "../reference";
+import diffing from "../render";
 import Router from "../router";
-import { convertElementToHTMLNMode, replaceHTMLElement } from "../utils";
+import { convertElementToHTMLNMode } from "../utils";
 import { BaseComponent } from "./base-component";
 import { sealed } from "./decorators";
 import Component from "./default/default-component";
@@ -12,7 +13,7 @@ interface StateOptions {
 }
 
 abstract class DefaultComponent extends Component {
-  private _path: number[] = [];
+  public path: number[] = [];
   public router: Router = new Router();
   static from(component: object) {
     return component;
@@ -25,22 +26,22 @@ abstract class DefaultComponent extends Component {
     return current;
   }
   public async flat(): Promise<BaseComponent<Tag>> {
-    async function dfs(current: DefaultComponent | BaseComponent<Tag>) {
-      current instanceof DefaultComponent ? await current.headFlat() : current;
-      // newCurrent.children.forEach(console.log);
+    async function dfs(
+      current: DefaultComponent | BaseComponent<Tag>
+    ): Promise<BaseComponent<Tag>> {
+      return current instanceof DefaultComponent
+        ? await current.headFlat()
+        : current;
     }
+
     const flatComponent = await this.headFlat();
-    await dfs(this);
+    await dfs(this); // Note: result is unused
     return flatComponent;
   }
 
-  public get path() {
-    return this._path;
-  }
-  public init(): void | Promise<void> {}
-  public set path(path: number[]) {
-    this._path = path;
-  }
+  protected init(): void | Promise<void> {}
+
+  protected unmount(): void | Promise<void> {}
 
   constructor() {
     super();
@@ -61,7 +62,7 @@ abstract class DefaultComponent extends Component {
           if (options?.searchParams) {
             window.location.search;
           }
-          this.refresh();
+          this.rerender();
           return res;
         },
       }
@@ -75,13 +76,10 @@ abstract class DefaultComponent extends Component {
   @sealed
   public set(callback: () => void) {
     callback();
-    this.refresh();
+    this.rerender();
   }
-  public async refresh() {
-    replaceHTMLElement(
-      this._path,
-      convertElementToHTMLNMode(await this.flat())
-    );
+  public async rerender() {
+    diffing(this.path, convertElementToHTMLNMode(await this.flat()));
   }
   public abstract build():
     | DefaultComponent

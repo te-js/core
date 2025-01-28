@@ -102,7 +102,6 @@ function getElementFromPath(path: number[]) {
   for (const i of path) {
     node = node.childNodes[i] as HTMLElement;
   }
-
   return node;
 }
 
@@ -126,3 +125,4 @@ export {
   replaceHTMLElement,
   TODO,
 };
+

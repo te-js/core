@@ -448,7 +448,6 @@ type HtmlEvents = {
     ev: HTMLElementEventMap[K]
   ) => void;
 };
-// Capitalize<string & K>
 type Tag = keyof HTMLElementTagNameMap;
 
 type IntrinsicAttributes<T extends Tag> = AriaAttributes &
