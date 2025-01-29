@@ -1,2 +1,2 @@
-class Component {}
-export default Component;
+class DefaultComponent {}
+export default DefaultComponent;

@@ -1,6 +1,6 @@
-import Component from "./default/default-component";
+import DefaultComponent from "./default/default-component";
 
-class ServerComponent extends Component {
+class ServerComponent extends DefaultComponent {
   public async build() {
     return this;
   }

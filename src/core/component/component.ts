@@ -5,14 +5,14 @@ import Router from "../router";
 import { convertElementToHTMLNMode } from "../utils";
 import { BaseComponent } from "./base-component";
 import { sealed } from "./decorators";
-import Component from "./default/default-component";
+import DefaultComponent from "./default/default-component";
 
 type ProxyRef<T> = T extends object ? T : { value: T };
 interface StateOptions {
   searchParams?: boolean;
 }
 
-abstract class DefaultComponent extends Component {
+abstract class Component extends DefaultComponent {
   public path: number[] = [];
   public router: Router = new Router();
   static from(component: object) {
@@ -20,18 +20,16 @@ abstract class DefaultComponent extends Component {
   }
   private async headFlat(): Promise<BaseComponent<Tag>> {
     let current = await this.build();
-    while (current instanceof DefaultComponent) {
+    while (current instanceof Component) {
       current = await current.build();
     }
     return current;
   }
   public async flat(): Promise<BaseComponent<Tag>> {
     async function dfs(
-      current: DefaultComponent | BaseComponent<Tag>
+      current: Component | BaseComponent<Tag>
     ): Promise<BaseComponent<Tag>> {
-      return current instanceof DefaultComponent
-        ? await current.headFlat()
-        : current;
+      return current instanceof Component ? await current.headFlat() : current;
     }
 
     const flatComponent = await this.headFlat();
@@ -62,6 +60,7 @@ abstract class DefaultComponent extends Component {
           if (options?.searchParams) {
             window.location.search;
           }
+          console.log("pr", newValue);
           this.rerender();
           return res;
         },
@@ -82,10 +81,11 @@ abstract class DefaultComponent extends Component {
     diffing(this.path, convertElementToHTMLNMode(await this.flat()));
   }
   public abstract build():
-    | DefaultComponent
+    | Component
     | BaseComponent<Tag>
-    | Promise<DefaultComponent>
+    | Promise<Component>
     | Promise<BaseComponent<Tag>>;
 }
 
-export { DefaultComponent };
+export { Component };
+

@@ -1,12 +1,8 @@
 import { htmlTags } from "../tags";
 import { BaseComponent } from "./base-component";
-import { DefaultComponent } from "./component";
-import Component from "./default/default-component";
+import { Component } from "./component";
 
-type BaseElement<T extends Tag> =
-  | BaseComponent<T>
-  | DefaultComponent
-  | BaseTypes;
+type BaseElement<T extends Tag> = BaseComponent<T> | Component | BaseTypes;
 
 export function $<T extends Tag>(
   tag: T,
@@ -27,11 +23,7 @@ const components = Object.fromEntries(
   htmlTags.map((tag) => [
     tag,
     (<T extends Tag>(...args: (BaseElement<T> | IntrinsicAttributes<T>)[]) => {
-      if (
-        args[0] instanceof DefaultComponent ||
-        args[0] instanceof BaseComponent ||
-        args[0] instanceof Component
-      ) {
+      if (args[0] instanceof Component || args[0] instanceof BaseComponent) {
         return $(tag, {}, ...(args as BaseElement<T>[]));
       } else if (typeof args[0] === "object") {
         const [props = {}, ...children] = args;

@@ -1,13 +1,13 @@
 import { BaseComponent } from "./component/base-component.js";
-import { DefaultComponent } from "./component/component.js";
+import { Component } from "./component/component.js";
 import { Reference } from "./reference.js";
 
 const GLOBALS = {
   component: 0,
   customId: 0,
-  cached: new Map<number[], BaseComponent<Tag> | DefaultComponent>(),
+  cached: new Map<number[], BaseComponent<Tag> | Component>(),
   currentPath: <number[]>[],
-  pages: new Map<string, typeof DefaultComponent>(),
+  pages: new Map<string, typeof Component>(),
 };
 const customProps = new Set(["ref", "cache"]);
 const TODO = new Error("TODO");
@@ -40,8 +40,7 @@ function convertElementToHTMLNMode<T extends Tag>(element: BaseComponent<T>) {
         console.log("cached");
         let element = GLOBAL("cached").get(newPath);
         if (!element) throw new Error("Bad state. no element");
-        while (element instanceof DefaultComponent)
-          element = await element.build();
+        while (element instanceof Component) element = await element.build();
         htmlNode.appendChild(document.createElement(element!.tag));
         continue;
       }
@@ -50,7 +49,7 @@ function convertElementToHTMLNMode<T extends Tag>(element: BaseComponent<T>) {
         addProps(newPath, childNode, child.props);
         dfs(child, childNode, newPath);
         htmlNode.appendChild(childNode);
-      } else if (child instanceof DefaultComponent) {
+      } else if (child instanceof Component) {
         const build = await child.flat();
         const childNode = document.createElement(build.tag);
         addProps(newPath, childNode, build.props);

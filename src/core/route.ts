@@ -1,8 +1,7 @@
-import { DefaultComponent } from "./component/component";
+import { Component } from "./component/component";
 import { convertElementToHTMLNMode, GLOBAL } from "./utils";
 
-async function render<T extends DefaultComponent>(page: T) {
-  console.log("dai", page);
+async function render<T extends Component>(page: T) {
   page.path = [0];
   const element = await page.flat();
   element.path = [0];
@@ -12,26 +11,16 @@ async function render<T extends DefaultComponent>(page: T) {
   document.body.appendChild(root);
 }
 
-// function getRoute(
-//   paths: Record<string, (...params: any[]) => Component>,
-//   location: string
-// ) {
-//   const locations = location.split("/");
-// }
-
-const route = (
-  paths: Record<string, (...params: any[]) => DefaultComponent>
-) => {
+const route = (paths: Record<string, (...params: any[]) => Component>) => {
   const router = new Proxy(window.location, {
     get: (target, key, receiver) => {
       return Reflect.get(target, key, receiver);
     },
     set(target, p, newValue, receiver) {
       if (p === "pathname") {
-        console.log("pages", newValue, GLOBAL("pages"));
-        if (newValue in GLOBAL("pages")) {
-          render(new (GLOBAL("pages").get(newValue)! as any)());
-        }
+        // if (newValue in GLOBAL("pages")) {
+        //   render(new (GLOBAL("pages").get(newValue)! as any)());
+        // }
         history.pushState({}, "", newValue);
         const locations = newValue.split("/");
 

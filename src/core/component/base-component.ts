@@ -1,18 +1,18 @@
 // import { IntrinsicAttributes, Tag } from "../../types";
 import { customId } from "../utils";
-import { DefaultComponent } from "./component";
-import Component from "./default/default-component";
+import { Component } from "./component";
+import DefaultComponent from "./default/default-component";
 
-class BaseComponent<T extends Tag> extends Component {
+class TNode<T extends Tag> extends DefaultComponent {
   tag: T;
   id: string;
   path: number[];
-  children: (BaseComponent<Tag> | DefaultComponent | BaseTypes)[];
+  children: (TNode<Tag> | Component | BaseTypes)[];
   props: IntrinsicAttributes<T>;
   constructor(
     tag: T,
     props: IntrinsicAttributes<T>,
-    ...children: (BaseComponent<Tag> | DefaultComponent | BaseTypes)[]
+    ...children: (TNode<Tag> | Component | BaseTypes)[]
   ) {
     super();
     this.tag = tag;
@@ -23,17 +23,17 @@ class BaseComponent<T extends Tag> extends Component {
   }
   public setPath() {
     async function dfs<T1 extends Tag>(
-      current: BaseComponent<T1> | DefaultComponent | BaseTypes,
+      current: TNode<T1> | Component | BaseTypes,
       path: number[]
     ) {
       let child;
-      if (current instanceof DefaultComponent) {
+      if (current instanceof Component) {
         current.path = path;
         child = await current.build();
-        while (child instanceof DefaultComponent) {
+        while (child instanceof Component) {
           child = await child.build();
         }
-      } else if (current instanceof BaseComponent) {
+      } else if (current instanceof TNode) {
         child = current;
       } else return;
       child!.path = path;
@@ -45,4 +45,4 @@ class BaseComponent<T extends Tag> extends Component {
   }
 }
 
-export { BaseComponent };
+export { TNode as BaseComponent };
