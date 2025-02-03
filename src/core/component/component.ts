@@ -3,7 +3,7 @@ import { Reference } from "../reference";
 import diffing from "../render";
 import Router from "../router";
 import { convertElementToHTMLNMode } from "../utils";
-import { BaseComponent } from "./base-component";
+import { TNode } from "./base-component";
 import { sealed } from "./decorators";
 import DefaultComponent from "./default/default-component";
 
@@ -18,22 +18,26 @@ abstract class Component extends DefaultComponent {
   static from(component: object) {
     return component;
   }
-  private async headFlat(): Promise<BaseComponent<Tag>> {
-    let current = await this.build();
+  private headFlat(): TNode<Tag> {
+    let current = this.build();
     while (current instanceof Component) {
-      current = await current.build();
+      current = current.build();
     }
     return current;
   }
-  public async flat(): Promise<BaseComponent<Tag>> {
-    async function dfs(
-      current: Component | BaseComponent<Tag>
-    ): Promise<BaseComponent<Tag>> {
-      return current instanceof Component ? await current.headFlat() : current;
+  public flat(): TNode<Tag> {
+    function dfs(current: Component | TNode<Tag> | BaseTypes) {
+      current instanceof Component ? current.headFlat() : current;
+      if (current instanceof TNode) {
+        for (const child of current.children) {
+          dfs(child);
+        }
+      }
     }
 
-    const flatComponent = await this.headFlat();
-    await dfs(this); // Note: result is unused
+    const flatComponent = this.headFlat();
+    dfs(this); // Note: result is unused
+    console.log(flatComponent);
     return flatComponent;
   }
 
@@ -80,11 +84,7 @@ abstract class Component extends DefaultComponent {
   public async rerender() {
     diffing(this.path, convertElementToHTMLNMode(await this.flat()));
   }
-  public abstract build():
-    | Component
-    | BaseComponent<Tag>
-    | Promise<Component>
-    | Promise<BaseComponent<Tag>>;
+  public abstract build(): Component | TNode<Tag>;
 }
 
 export { Component };

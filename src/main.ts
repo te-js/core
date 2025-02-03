@@ -71,7 +71,7 @@ class Test extends Component {
         button({ class: "counter", onclick: this.decrease.bind(this) }, "- 1")
       ),
       p({}, this.testo.value, " ", this.value.value),
-      div({ class: "container" }, ...boxes(this.counter.value))
+      div({ class: "container" }, new Boxes(this.counter.value + 1))
     );
   }
   async onclick() {
@@ -83,17 +83,33 @@ class Test extends Component {
   }
 }
 
+class Boxes extends Component {
+  constructor(private length: number) {
+    super();
+  }
+  build() {
+    return div(...boxes(this.length));
+  }
+}
+
 function boxes(length: number) {
   return Array.from({ length }, (_, i) => i).map((e) =>
     div({ class: "box" }, e)
   );
 }
 
+@page("/counter")
+class Counter2 extends Component {
+  build() {
+    return div(main(div(h1(new Counter()))));
+  }
+}
+
 class Counter extends Component {
   counter = this.state(0);
   name = this.state("");
   reference = this.ref();
-  async build() {
+  build() {
     return div(
       { onload: () => {} },
       p(this.name.value),
@@ -119,12 +135,7 @@ class Counter extends Component {
   }
 }
 
-@page("/counter")
-class Counter2 extends Component {
-  build() {
-    return div(main(div(h1(new Counter()))));
-  }
-}
+
 
 route({
   "/": () => new Main(),

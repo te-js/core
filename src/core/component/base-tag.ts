@@ -1,29 +1,26 @@
 import { htmlTags } from "../tags";
-import { BaseComponent } from "./base-component";
+import { TNode } from "./base-component";
 import { Component } from "./component";
 
-type BaseElement<T extends Tag> = BaseComponent<T> | Component | BaseTypes;
+type BaseElement<T extends Tag> = TNode<T> | Component | BaseTypes;
 
 export function $<T extends Tag>(
   tag: T,
   props: IntrinsicAttributes<T>,
   ...children: BaseElement<T>[]
-): BaseComponent<T> {
-  return new BaseComponent<T>(tag, props, ...children);
+): TNode<T> {
+  return new TNode<T>(tag, props, ...children);
 }
 
 type BaseComponentBuilder = {
-  (
-    props?: BaseComponent<Tag>["props"],
-    ...children: BaseElement<Tag>[]
-  ): BaseComponent<Tag>;
-  (...children: BaseElement<Tag>[]): BaseComponent<Tag>;
+  (props?: TNode<Tag>["props"], ...children: BaseElement<Tag>[]): TNode<Tag>;
+  (...children: BaseElement<Tag>[]): TNode<Tag>;
 };
 const components = Object.fromEntries(
   htmlTags.map((tag) => [
     tag,
     (<T extends Tag>(...args: (BaseElement<T> | IntrinsicAttributes<T>)[]) => {
-      if (args[0] instanceof Component || args[0] instanceof BaseComponent) {
+      if (args[0] instanceof Component || args[0] instanceof TNode) {
         return $(tag, {}, ...(args as BaseElement<T>[]));
       } else if (typeof args[0] === "object") {
         const [props = {}, ...children] = args;
