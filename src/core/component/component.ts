@@ -3,7 +3,7 @@ import { Reference } from "../reference";
 import diffing from "../render";
 import Router from "../router";
 import { convertElementToHTMLNMode } from "../utils";
-import { BaseComponent } from "./base-component";
+import { TNode } from "./base-component";
 import { sealed } from "./decorators";
 import DefaultComponent from "./default/default-component";
 
@@ -13,22 +13,20 @@ interface StateOptions {
 }
 
 abstract class Component extends DefaultComponent {
-  public path: number[] = [];
   public router: Router = new Router();
+  public render: boolean = false;
   static from(component: object) {
     return component;
   }
-  private async headFlat(): Promise<BaseComponent<Tag>> {
+  private async headFlat(): Promise<TNode<Tag>> {
     let current = await this.build();
     while (current instanceof Component) {
       current = await current.build();
     }
     return current;
   }
-  public async flat(): Promise<BaseComponent<Tag>> {
-    async function dfs(
-      current: Component | BaseComponent<Tag>
-    ): Promise<BaseComponent<Tag>> {
+  public async flat(): Promise<TNode<Tag>> {
+    async function dfs(current: Component | TNode<Tag>): Promise<TNode<Tag>> {
       return current instanceof Component ? await current.headFlat() : current;
     }
 
@@ -51,6 +49,13 @@ abstract class Component extends DefaultComponent {
     this.path = path;
   }
 
+  public set(callback: () => void) {
+    this.render = false;
+    callback();
+    this.render = true;
+    this.rerender();
+  }
+
   public state<T>(value: T, options?: StateOptions) {
     return new Proxy<ProxyRef<T>>(
       (typeof value === "object" ? value : { value }) as ProxyRef<T>,
@@ -60,7 +65,6 @@ abstract class Component extends DefaultComponent {
           if (options?.searchParams) {
             window.location.search;
           }
-          console.log("pr", newValue);
           this.rerender();
           return res;
         },
@@ -72,19 +76,15 @@ abstract class Component extends DefaultComponent {
     return new Reference(null);
   }
 
-  @sealed
-  public set(callback: () => void) {
-    callback();
-    this.rerender();
-  }
   public async rerender() {
+    if (!this.render) return;
     diffing(this.path, convertElementToHTMLNMode(await this.flat()));
   }
   public abstract build():
     | Component
-    | BaseComponent<Tag>
+    | TNode<Tag>
     | Promise<Component>
-    | Promise<BaseComponent<Tag>>;
+    | Promise<TNode<Tag>>;
 }
 
 export { Component };

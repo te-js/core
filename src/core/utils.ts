@@ -1,11 +1,11 @@
-import { BaseComponent } from "./component/base-component.js";
+import { TNode } from "./component/base-component.js";
 import { Component } from "./component/component.js";
 import { Reference } from "./reference.js";
 
 const GLOBALS = {
   component: 0,
   customId: 0,
-  cached: new Map<number[], BaseComponent<Tag> | Component>(),
+  cached: new Map<number[], TNode<Tag> | Component>(),
   currentPath: <number[]>[],
   pages: new Map<string, typeof Component>(),
 };
@@ -26,12 +26,8 @@ function GLOBAL<T extends keyof typeof GLOBALS>(
 
 const customId = () => GLOBAL("customId", (old) => old + 1);
 
-function convertElementToHTMLNMode<T extends Tag>(element: BaseComponent<T>) {
-  async function dfs(
-    node: BaseComponent<Tag>,
-    htmlNode: HTMLElement,
-    path: number[]
-  ) {
+function convertElementToHTMLNMode<T extends Tag>(element: TNode<T>) {
+  async function dfs(node: TNode<Tag>, htmlNode: HTMLElement, path: number[]) {
     for (let i = 0; i < node.children.length; i++) {
       const newPath = [...path, i];
 
@@ -44,7 +40,7 @@ function convertElementToHTMLNMode<T extends Tag>(element: BaseComponent<T>) {
         htmlNode.appendChild(document.createElement(element!.tag));
         continue;
       }
-      if (child instanceof BaseComponent) {
+      if (child instanceof TNode) {
         const childNode = document.createElement(child.tag);
         addProps(newPath, childNode, child.props);
         dfs(child, childNode, newPath);
@@ -124,4 +120,3 @@ export {
   replaceHTMLElement,
   TODO,
 };
-

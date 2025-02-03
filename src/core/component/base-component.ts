@@ -45,4 +45,4 @@ class TNode<T extends Tag> extends DefaultComponent {
   }
 }
 
-export { TNode as BaseComponent };
+export { TNode };

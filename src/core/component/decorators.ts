@@ -1,11 +1,11 @@
 import { GLOBAL } from "../utils";
-import { DefaultComponent } from "./component";
+import { Component } from "./component";
 
 function sealed(_: any, __: string, descriptor: PropertyDescriptor): void {
   descriptor.writable = false;
 }
 function page(message: string) {
-  return <T extends typeof DefaultComponent>(target: T) => {
+  return <T extends typeof Component>(target: T) => {
     GLOBAL("pages").set(message, target);
   };
 }

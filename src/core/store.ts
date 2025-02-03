@@ -5,17 +5,23 @@ class Store<T extends object> {
 
   constructor(protected value: T) {}
 
-  // Returns the current state
   read(): T {
     return this.value;
   }
 
   private proxy<T extends object>(value: T): T {
     return new Proxy(value, {
-      set: (target, p, newValue, receiver) => {
-        const newStore = Reflect.set(target, p, newValue, receiver);
+      get: (target, prop, receiver) => {
+        const value = Reflect.get(target, prop, receiver);
+        if (typeof value === "object" && value !== null) {
+          return this.proxy(value);
+        }
+        return value;
+      },
+      set: (target, prop, newValue, receiver) => {
+        const result = Reflect.set(target, prop, newValue, receiver);
         this.notifyComponents();
-        return newStore;
+        return result;
       },
     });
   }
