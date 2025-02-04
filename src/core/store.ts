@@ -1,6 +1,7 @@
 import { Component } from "./component/component";
 
 class Store<T extends object> {
+  private listen: boolean = true;
   protected components: Set<Component> = new Set();
 
   constructor(protected value: T) {}
@@ -12,36 +13,42 @@ class Store<T extends object> {
   private proxy<T extends object>(value: T): T {
     return new Proxy(value, {
       get: (target, prop, receiver) => {
-        const value = Reflect.get(target, prop, receiver);
-        if (typeof value === "object" && value !== null) {
-          return this.proxy(value);
+        const newValue = Reflect.get(target, prop, receiver);
+        if (typeof newValue === "object" && newValue !== null) {
+          return this.proxy(newValue);
         }
-        return value;
+        return newValue;
       },
       set: (target, prop, newValue, receiver) => {
         const result = Reflect.set(target, prop, newValue, receiver);
-        this.notifyComponents();
+        this.listen && this.notifyComponents();
         return result;
       },
     });
   }
 
-  watch(component: Component): T {
+  public watch(component: Component): T {
     this.components.add(component);
     return this.proxy(this.value);
   }
 
-  unwatch(component: Component): void {
+  public set(callback: (value: T) => void) {
+    this.listen = false;
+    callback(this.value);
+    this.listen = true;
+    // console.log(this.value);
+    this.notifyComponents();
+  }
+
+  public unwatch(component: Component): void {
     this.components.delete(component);
   }
 
   private notifyComponents(): void {
-    console.log("PR");
+    // console.log(this.components);
     for (const component of this.components) {
-      // if (component instanceof Component) {
       component.rerender();
-      console.log(component);
-      // }
+      // console.log(component);
     }
   }
 }

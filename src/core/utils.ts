@@ -36,7 +36,12 @@ function convertElementToHTMLNMode<T extends Tag>(element: TNode<T>) {
         console.log("cached");
         let element = GLOBAL("cached").get(newPath);
         if (!element) throw new Error("Bad state. no element");
-        while (element instanceof Component) element = element.build();
+        while (element instanceof Component) {
+          element.beforeMount();
+          const temp = element;
+          element = element.build();
+          temp.mounted();
+        }
         htmlNode.appendChild(document.createElement(element!.tag));
         continue;
       }

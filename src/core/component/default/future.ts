@@ -1,32 +1,59 @@
-import { TNode } from "../base-component";
+import { button, div } from "../../..";
+import store from "../../../types/store";
 import { Component } from "../component";
 
-interface FutureProps<T> {
-  builder: (value: T) => TNode<keyof HTMLElementTagNameMap>;
-  error: (error: Error) => TNode<keyof HTMLElementTagNameMap>;
-  loading: () => TNode<keyof HTMLElementTagNameMap>;
+// interface FutureProps<T> {
+//   builder: (value: T) => TElement;
+//   error?: (error: Error) => TElement;
+//   loading?: () => TElement;
+// }
+
+// interface IState<T> {
+//   error: Error | null;
+//   loading: boolean;
+//   data: T | null;
+// }
+
+async function fetchPosts(): Promise<any[]> {
+  let result: any = await fetch("https://jsonplaceholder.typicode.com/posts");
+  result = await result.json();
+  setTimeout(() => {}, 1000);
+
+  return await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(result);
+    }, 1000);
+  });
 }
 
-class Future<T extends Promise<T>> extends Component {
+class Future extends Component {
+  private result: any[] = this.state([]);
   private loading = this.state(false);
-  private error = this.state<{ error: Error | null }>({ error: null });
-  private data = this.state<{ data: T | null }>({ data: null });
-  constructor(private promise: Promise<T>, private props: FutureProps<T>) {
+
+  constructor() {
     super();
-    this.loading.value = true;
-    this.promise
-      .then((res) => (this.data.data = res))
-      .catch((error) => (this.error.error = error))
-      .finally(() => (this.loading.value = false));
   }
+
+  init() {
+    return;
+  }
+
+  mounted() {
+    console.log("mounted");
+  }
+
   build() {
-    if (this.loading.value) {
-      return this.props.loading();
-    }
-    if (this.error.error) {
-      return this.props.error(this.error.error);
-    }
-    return this.props.builder(this.data.data!);
+    const myStore = store.watch(this);
+    return div(
+      myStore.value,
+      JSON.stringify(this.result),
+      this.loading.value ? "Loading..." : "Completed",
+      button({ class: "text-dark", onclick: () => this.onclick() }, "reset")
+    );
+  }
+
+  onclick() {
+    store.set((clone) => (clone.value = 0));
   }
 }
 

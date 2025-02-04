@@ -160,15 +160,16 @@ function applyPatches(tree: HTMLElement, patches: Patch[]): HTMLElement {
         break;
     }
   }
-
   return tree;
 }
 
 function diffing(path: number[], newTree: HTMLElement): void {
   const oldTree = getElementFromPath(path);
-  console.log("old", oldTree);
   applyPatches(oldTree, diffTrees(oldTree, newTree));
-  console.log("new", newTree);
 }
+
+// function state<T>(value: T) {
+//   return value;
+// }
 
 export default diffing;

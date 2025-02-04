@@ -1,4 +1,3 @@
-import { Reference } from "../reference";
 import diffing from "../render";
 import Router from "../router";
 import { convertElementToHTMLNMode } from "../utils";
@@ -13,7 +12,7 @@ interface StateOptions {
 
 abstract class Component extends DefaultComponent {
   public router: Router = new Router();
-  public render: boolean = false;
+  private render: boolean = true;
   static from(component: object) {
     return component;
   }
@@ -23,6 +22,15 @@ abstract class Component extends DefaultComponent {
       current = current.build();
     }
     return current;
+  }
+  public beforeMount() {
+    throw new Error("Method not implemented.");
+  }
+  public mounted() {
+    throw new Error("Method not implemented.");
+  }
+  public afterMount() {
+    throw new Error("Method not implemented.");
   }
   public flat(): TNode<Tag> {
     function dfs(current: Component | TNode<Tag> | BaseTypes) {
@@ -42,7 +50,6 @@ abstract class Component extends DefaultComponent {
   protected init(): void | Promise<void> {}
 
   protected unmount(): void | Promise<void> {}
-
   constructor() {
     super();
     this.init();
@@ -64,11 +71,18 @@ abstract class Component extends DefaultComponent {
     return new Proxy<ProxyRef<T>>(
       (typeof value === "object" ? value : { value }) as ProxyRef<T>,
       {
+        get: (target: ProxyRef<T>, p: string | symbol) => {
+          const newValue = Reflect.get(target, p);
+          if (typeof newValue === "object" && newValue !== null) {
+            return this.state(newValue, options);
+          }
+          return newValue;
+        },
         set: (target: ProxyRef<T>, p: string | symbol, newValue: any) => {
           const res = Reflect.set(target, p, newValue);
-          if (options?.searchParams) {
-            window.location.search;
-          }
+          // if (options?.searchParams) {
+          //   window.location.search;
+          // }
           this.rerender();
           return res;
         },
@@ -76,14 +90,11 @@ abstract class Component extends DefaultComponent {
     );
   }
 
-  public ref() {
-    return new Reference(null);
-  }
-
   public rerender() {
     if (!this.render) return;
     diffing(this.path, convertElementToHTMLNMode(this.flat()));
   }
+
   public abstract build(): Component | TNode<Tag>;
 }
 
