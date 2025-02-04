@@ -1,7 +1,7 @@
 import DefaultComponent from "./default/default-component";
 
 class ServerComponent extends DefaultComponent {
-  public async build() {
+  public build() {
     return this;
   }
 }

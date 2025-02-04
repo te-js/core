@@ -27,7 +27,7 @@ function GLOBAL<T extends keyof typeof GLOBALS>(
 const customId = () => GLOBAL("customId", (old) => old + 1);
 
 function convertElementToHTMLNMode<T extends Tag>(element: TNode<T>) {
-  async function dfs(node: TNode<Tag>, htmlNode: HTMLElement, path: number[]) {
+  function dfs(node: TNode<Tag>, htmlNode: HTMLElement, path: number[]) {
     for (let i = 0; i < node.children.length; i++) {
       const newPath = [...path, i];
 
@@ -36,7 +36,7 @@ function convertElementToHTMLNMode<T extends Tag>(element: TNode<T>) {
         console.log("cached");
         let element = GLOBAL("cached").get(newPath);
         if (!element) throw new Error("Bad state. no element");
-        while (element instanceof Component) element = await element.build();
+        while (element instanceof Component) element = element.build();
         htmlNode.appendChild(document.createElement(element!.tag));
         continue;
       }
@@ -46,7 +46,7 @@ function convertElementToHTMLNMode<T extends Tag>(element: TNode<T>) {
         dfs(child, childNode, newPath);
         htmlNode.appendChild(childNode);
       } else if (child instanceof Component) {
-        const build = await child.flat();
+        const build = child.flat();
         const childNode = document.createElement(build.tag);
         addProps(newPath, childNode, build.props);
         dfs(build, childNode, newPath);
@@ -120,3 +120,4 @@ export {
   replaceHTMLElement,
   TODO,
 };
+

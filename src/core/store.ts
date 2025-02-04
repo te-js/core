@@ -36,10 +36,12 @@ class Store<T extends object> {
   }
 
   private notifyComponents(): void {
+    console.log("PR");
     for (const component of this.components) {
-      if (component instanceof Component) {
-        component.rerender();
-      }
+      // if (component instanceof Component) {
+      component.rerender();
+      console.log(component);
+      // }
     }
   }
 }

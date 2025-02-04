@@ -166,9 +166,9 @@ function applyPatches(tree: HTMLElement, patches: Patch[]): HTMLElement {
 
 function diffing(path: number[], newTree: HTMLElement): void {
   const oldTree = getElementFromPath(path);
-  console.log("old tree", oldTree);
-  console.log("new tree", newTree);
+  console.log("old", oldTree);
   applyPatches(oldTree, diffTrees(oldTree, newTree));
+  console.log("new", newTree);
 }
 
 export default diffing;

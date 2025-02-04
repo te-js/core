@@ -1,9 +1,9 @@
 import { Component } from "./component/component";
 import { convertElementToHTMLNMode, GLOBAL } from "./utils";
 
-async function render<T extends Component>(page: T) {
+function render<T extends Component>(page: T) {
   page.path = [0];
-  const element = await page.flat();
+  const element = page.flat();
   element.path = [0];
   element.setPath();
   const root = convertElementToHTMLNMode(element);

@@ -22,16 +22,16 @@ class TNode<T extends Tag> extends DefaultComponent {
     this.children = children;
   }
   public setPath() {
-    async function dfs<T1 extends Tag>(
+    function dfs<T1 extends Tag>(
       current: TNode<T1> | Component | BaseTypes,
       path: number[]
     ) {
       let child;
       if (current instanceof Component) {
         current.path = path;
-        child = await current.build();
+        child = current.build();
         while (child instanceof Component) {
-          child = await child.build();
+          child = child.build();
         }
       } else if (current instanceof TNode) {
         child = current;

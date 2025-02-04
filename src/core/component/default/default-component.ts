@@ -4,5 +4,7 @@ class DefaultComponent {
   constructor() {
     this.key = Math.random().toString(36).substring(7);
   }
+
+  // build()
 }
 export default DefaultComponent;

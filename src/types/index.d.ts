@@ -455,3 +455,4 @@ type IntrinsicAttributes<T extends Tag> = AriaAttributes &
   HtmlEvents;
 
 type BaseTypes = string | number | boolean;
+

@@ -1,4 +1,3 @@
-// import { Tag } from "../../types";
 import { Reference } from "../reference";
 import diffing from "../render";
 import Router from "../router";
@@ -27,7 +26,7 @@ abstract class Component extends DefaultComponent {
   }
   public flat(): TNode<Tag> {
     function dfs(current: Component | TNode<Tag> | BaseTypes) {
-      current instanceof Component ? current.headFlat() : current;
+      current = current instanceof Component ? current.headFlat() : current;
       if (current instanceof TNode) {
         for (const child of current.children) {
           dfs(child);
@@ -36,8 +35,7 @@ abstract class Component extends DefaultComponent {
     }
 
     const flatComponent = this.headFlat();
-    dfs(this); // Note: result is unused
-    console.log(flatComponent);
+    dfs(flatComponent);
     return flatComponent;
   }
 
@@ -82,12 +80,11 @@ abstract class Component extends DefaultComponent {
     return new Reference(null);
   }
 
-  public async rerender() {
+  public rerender() {
     if (!this.render) return;
-    diffing(this.path, convertElementToHTMLNMode(await this.flat()));
+    diffing(this.path, convertElementToHTMLNMode(this.flat()));
   }
   public abstract build(): Component | TNode<Tag>;
 }
 
 export { Component };
-

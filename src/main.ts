@@ -16,26 +16,30 @@ async function fetchPosts() {
 class Prova extends Component {
   private counter = this.state(store.read());
   build() {
-    return main("Main", JSON.stringify(this.counter));
+    return main(
+      "Main",
+      JSON.stringify(this.counter),
+      button({ onclick: () => this.onclick() }, "add")
+    );
+  }
+  onclick() {
+    this.set(() => {
+      store.watch(this).value++;
+    });
   }
 }
-const pr = new Prova();
+
 class Main extends Component {
-  // value = store.watch(this);
   counter = this.state(0);
+
   build() {
     return main(
       div(
-        pr,
-        // new Future(fetchPosts(), {
-        //   loading: () => p("loading..."),
-        //   builder: (value) => p(JSON.stringify(value)),
-        //   error: (error) => p(error.message),
-        // }),
+        new Prova(),
         button({ onclick: () => this.increment() }, "Increment"),
         p({ class: "prova" }, `ciao mondo ${this.counter.value}`),
         h1("example counter "),
-        p("Store ", store.read().value),
+        p("Store ", store.watch(this).value),
         button({ onclick: () => this.modifyStore() }, "Increment"),
         // prova,
         p(this.counter.value),
@@ -49,7 +53,6 @@ class Main extends Component {
       store.watch(this).value++;
       this.counter.value++;
     });
-    console.log("ddidididdi");
   }
   decrement() {
     store.watch(this).value--;
