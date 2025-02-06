@@ -1,5 +1,5 @@
 import { button, div } from "../../..";
-import store from "../../../types/store";
+import store from "../../../store";
 import { Component } from "../component";
 
 // interface FutureProps<T> {

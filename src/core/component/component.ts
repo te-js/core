@@ -47,12 +47,15 @@ abstract class Component extends DefaultComponent {
     return flatComponent;
   }
 
-  protected init(): void | Promise<void> {}
+  protected init(callback: () => void): void | Promise<void> {
+    this.render = false;
+    callback();
+    this.render = true;
+  }
 
   protected unmount(): void | Promise<void> {}
   constructor() {
     super();
-    this.init();
   }
 
   @sealed

@@ -1,5 +1,5 @@
 import { button, Component, div, h1, main, p, route, TElement } from "./index";
-import store from "./types/store";
+import store from "./store";
 
 // async function fetchPosts(): Promise<any[]> {
 //   let result: any = await fetch("https://jsonplaceholder.typicode.com/posts");
@@ -13,9 +13,32 @@ import store from "./types/store";
 //   });
 // }
 
+class Item extends Component {
+  #toggle = this.state(false);
+  constructor(private i: number) {
+    super();
+  }
+
+  build() {
+    return div(
+      {
+        onclick: () => this.#onToggle(),
+        class: `${this.#toggle.value && "text-dark"}`,
+      },
+      this.i.toString()
+    );
+  }
+  #onToggle() {
+    this.#toggle.value = !this.#toggle.value;
+  }
+}
+
 class Prova extends Component {
   private loading = this.state(false);
   private test = this.state<{ pr: { pro: number } }>({ pr: { pro: 0 } });
+  constructor() {
+    super();
+  }
   build() {
     const myStore = store.watch(this);
     return main(
@@ -24,6 +47,10 @@ class Prova extends Component {
       p(this.test.pr.pro),
       JSON.stringify(myStore),
       // ...this.result.map(this.postItem),
+      div(
+        { class: "flex" },
+        ...Array.from({ length: this.test.pr.pro }).map((_, i) => new Item(i))
+      ),
       button({ class: "text-dark", onclick: () => this.onclick() }, "add"),
       button({ class: "text-dark", onclick: () => this.test.pr.pro++ }, "add")
     );
@@ -48,9 +75,24 @@ class Main extends Component {
     console.log("Main");
   }
 
+  changeMode() {
+    store.set((clone) => {
+      clone.toggle = !clone.toggle;
+    });
+    document.body.classList.toggle("dark-theme");
+  }
+
   build() {
+    const myStore = store.watch(this);
     return main(
       div(
+        button(
+          {
+            class: "text-dark",
+            onclick: () => this.changeMode(),
+          },
+          myStore.toggle ? "dark" : "light"
+        ),
         this.prova,
         button(
           { class: "text-dark", onclick: () => this.increment() },
@@ -58,7 +100,7 @@ class Main extends Component {
         ),
         p({ class: "prova" }, `ciao mondo ${this.counter.value}`),
         h1("example counter "),
-        p("Store ", store.watch(this).value),
+        p("Store ", myStore.value),
         button(
           { class: "text-dark", onclick: () => this.modifyStore() },
           "Increment"

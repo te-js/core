@@ -1,4 +1,4 @@
-import { Store } from "../core/store";
+import { Store } from "./index";
 
 interface IStore {
   value: number;
