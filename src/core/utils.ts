@@ -6,6 +6,7 @@ const GLOBALS = {
   component: 0,
   customId: 0,
   cached: new Map<number[], TNode<Tag> | Component>(),
+  states: new Map<string, any>(),
   currentPath: <number[]>[],
   pages: new Map<string, typeof Component>(),
 };

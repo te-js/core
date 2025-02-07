@@ -1,6 +1,6 @@
 import diffing from "../render";
 import Router from "../router";
-import { convertElementToHTMLNMode } from "../utils";
+import { convertElementToHTMLNMode, GLOBAL } from "../utils";
 import { TNode } from "./base-component";
 import { sealed } from "./decorators";
 import DefaultComponent from "./default/default-component";
@@ -13,13 +13,27 @@ interface StateOptions {
 abstract class Component extends DefaultComponent {
   public router: Router = new Router();
   private render: boolean = true;
+  private stateCache: Map<string, any> = new Map();
+  private stateKeys: Map<string, string> = new Map();
+
+  constructor(protected key?: string) {
+    super();
+    const cacheKey = this.getCacheKey();
+    const cachedState = GLOBAL("states").get(cacheKey);
+    if (cachedState) {
+      this.stateCache = new Map(cachedState.values);
+      this.stateKeys = new Map(cachedState.keys);
+    }
+  }
+
+  private getCacheKey(): string {
+    return `${this.constructor.name}_${this.key || ""}`;
+  }
+
   static from(component: object) {
     return component;
   }
 
-  constructor(protected key?: string) {
-    super();
-  }
   private headFlat(): TNode<Tag> {
     let current = this.build();
     while (current instanceof Component) {
@@ -39,7 +53,6 @@ abstract class Component extends DefaultComponent {
   public flat(): TNode<Tag> {
     function dfs(current: Component | TNode<Tag> | BaseTypes) {
       if (current instanceof Component) {
-        console.log(current, current.key);
         current = current.headFlat();
       }
       if (current instanceof TNode) {
@@ -60,7 +73,9 @@ abstract class Component extends DefaultComponent {
     this.render = true;
   }
 
-  protected unmount(): void | Promise<void> {}
+  protected unmount(): void | Promise<void> {
+    GLOBAL("states").delete(this.getCacheKey());
+  }
 
   @sealed
   public setPath(path: number[]) {
@@ -75,7 +90,21 @@ abstract class Component extends DefaultComponent {
   }
 
   public state<T>(value: T, options?: StateOptions) {
-    return new Proxy<ProxyRef<T>>(
+    const propertyKey =
+      new Error().stack?.split("\n")[2]?.match(/at.*?\.(\w+)/)?.[1] ||
+      Math.random().toString(36).substring(7);
+
+    let stateKey = this.stateKeys.get(propertyKey);
+    if (!stateKey) {
+      stateKey = Math.random().toString(36).substring(7);
+      this.stateKeys.set(propertyKey, stateKey);
+    }
+
+    if (this.stateCache.has(stateKey)) {
+      value = this.stateCache.get(stateKey);
+    }
+
+    const proxy = new Proxy<ProxyRef<T>>(
       (typeof value === "object" ? value : { value }) as ProxyRef<T>,
       {
         get: (target: ProxyRef<T>, p: string | symbol) => {
@@ -87,14 +116,30 @@ abstract class Component extends DefaultComponent {
         },
         set: (target: ProxyRef<T>, p: string | symbol, newValue: any) => {
           const res = Reflect.set(target, p, newValue);
-          // if (options?.searchParams) {
-          //   window.location.search;
-          // }
+          this.stateCache.set(stateKey, target);
+          GLOBAL("states").set(this.getCacheKey(), {
+            values: Array.from(this.stateCache.entries()),
+            keys: Array.from(this.stateKeys.entries()),
+          });
+
           this.rerender();
           return res;
         },
       }
     );
+
+    if (!this.stateCache.has(stateKey)) {
+      this.stateCache.set(
+        stateKey,
+        typeof value === "object" ? value : { value }
+      );
+      GLOBAL("states").set(this.getCacheKey(), {
+        values: Array.from(this.stateCache.entries()),
+        keys: Array.from(this.stateKeys.entries()),
+      });
+    }
+
+    return proxy;
   }
 
   public rerender() {
