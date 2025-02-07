@@ -16,6 +16,10 @@ abstract class Component extends DefaultComponent {
   static from(component: object) {
     return component;
   }
+
+  constructor(protected key?: string) {
+    super();
+  }
   private headFlat(): TNode<Tag> {
     let current = this.build();
     while (current instanceof Component) {
@@ -34,7 +38,10 @@ abstract class Component extends DefaultComponent {
   }
   public flat(): TNode<Tag> {
     function dfs(current: Component | TNode<Tag> | BaseTypes) {
-      current = current instanceof Component ? current.headFlat() : current;
+      if (current instanceof Component) {
+        console.log(current, current.key);
+        current = current.headFlat();
+      }
       if (current instanceof TNode) {
         for (const child of current.children) {
           dfs(child);
@@ -54,9 +61,6 @@ abstract class Component extends DefaultComponent {
   }
 
   protected unmount(): void | Promise<void> {}
-  constructor() {
-    super();
-  }
 
   @sealed
   public setPath(path: number[]) {
@@ -95,7 +99,9 @@ abstract class Component extends DefaultComponent {
 
   public rerender() {
     if (!this.render) return;
-    diffing(this.path, convertElementToHTMLNMode(this.flat()));
+    const build = this.flat();
+    diffing(this.path, convertElementToHTMLNMode(build));
+    build.setPath(this.path);
   }
 
   public abstract build(): Component | TNode<Tag>;

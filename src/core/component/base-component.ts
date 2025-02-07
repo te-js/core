@@ -21,7 +21,7 @@ class TNode<T extends Tag> extends DefaultComponent {
     this.props = props;
     this.children = children;
   }
-  public setPath() {
+  public setPath(parentPath: number[] | null = null) {
     function dfs<T1 extends Tag>(
       current: TNode<T1> | Component | BaseTypes,
       path: number[]
@@ -41,6 +41,7 @@ class TNode<T extends Tag> extends DefaultComponent {
         dfs(child!.children[i], [...path, i]);
       }
     }
+    if (parentPath) this.path = parentPath;
     dfs(this, this.path);
   }
 }
