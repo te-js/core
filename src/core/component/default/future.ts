@@ -1,60 +1,51 @@
-import { button, div } from "../../..";
-import store from "../../../store";
+import { TElement } from "../../..";
 import { Component } from "../component";
 
-// interface FutureProps<T> {
-//   builder: (value: T) => TElement;
-//   error?: (error: Error) => TElement;
-//   loading?: () => TElement;
-// }
-
-// interface IState<T> {
-//   error: Error | null;
-//   loading: boolean;
-//   data: T | null;
-// }
-
-async function fetchPosts(): Promise<any[]> {
-  let result: any = await fetch("https://jsonplaceholder.typicode.com/posts");
-  result = await result.json();
-  setTimeout(() => {}, 1000);
-
-  return await new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(result);
-    }, 1000);
-  });
+interface ResolverProps<T> {
+  builder: (value: T) => TElement;
+  error?: (error: Error) => TElement;
+  loading?: () => TElement;
 }
 
-class Future extends Component {
-  private result: any[] = this.state([]);
-  private loading = this.state(false);
+interface IState<T> {
+  error: Error | null;
+  loading: boolean;
+  data: T | null;
+}
 
-  constructor() {
-    super();
+class Resolver<T> extends Component {
+  protected currentState = this.state<IState<T>>({
+    error: null,
+    loading: false,
+    data: null,
+  });
+
+  constructor(
+    key: string,
+    protected promise: Promise<T>,
+    protected props: ResolverProps<T>
+  ) {
+    super(key);
+    this.init(() => this.initialize());
   }
 
-  init() {
-    return;
-  }
-
-  mounted() {
-    console.log("mounted");
+  private initialize() {
+    this.currentState.loading = true;
+    this.promise
+      .then((res) => (this.currentState.data = res))
+      .catch((err) => (this.currentState.error = err))
+      .finally(() => (this.currentState.loading = false));
   }
 
   build() {
-    const myStore = store.watch(this);
-    return div(
-      myStore.value,
-      JSON.stringify(this.result),
-      this.loading.value ? "Loading..." : "Completed",
-      button({ class: "text-dark", onclick: () => this.onclick() }, "reset")
-    );
-  }
-
-  onclick() {
-    store.set((clone) => (clone.value = 0));
+    if (this.currentState.loading && this.props.loading) {
+      return this.props.loading();
+    }
+    if (this.currentState.error && this.props.error) {
+      return this.props.error(this.currentState.error);
+    }
+    return this.props.builder(this.currentState.data!);
   }
 }
 
-export { Future };
+export { Resolver as Resolver };

@@ -8,6 +8,7 @@ const GLOBALS = {
   cached: new Map<number[], TNode<Tag> | Component>(),
   states: new Map<string, any>(),
   currentPath: <number[]>[],
+  reactive: true,
   pages: new Map<string, typeof Component>(),
 };
 const customProps = new Set(["ref", "cache"]);
@@ -86,13 +87,10 @@ function addProps(
         case "cache":
           if (!GLOBAL("cached").has(path)) {
             console.log("to cache", element);
-
-            // GLOBAL("cached").set(path, element);
           }
           break;
       }
     } else if (key.startsWith("on")) {
-      // console.log(key.slice(2).toLowerCase(), value);
       element.addEventListener(key.slice(2).toLowerCase(), value);
     } else element.setAttribute(key, value);
   }

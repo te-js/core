@@ -6,9 +6,6 @@ class Router {
     return variables;
   }
   constructor() {}
-  // public setSearchParams(key: string, value: string) {
-  //   // window.location.search += "&${}
-  // }
 }
 
 export default Router;

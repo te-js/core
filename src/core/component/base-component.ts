@@ -1,4 +1,3 @@
-// import { IntrinsicAttributes, Tag } from "../../types";
 import { customId } from "../utils";
 import { Component } from "./component";
 import DefaultComponent from "./default/default-component";

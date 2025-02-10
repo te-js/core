@@ -12,12 +12,12 @@ interface StateOptions {
 
 abstract class Component extends DefaultComponent {
   public router: Router = new Router();
-  private render: boolean = true;
+  private reactive: boolean = true;
   private stateCache: Map<string, any> = new Map();
   private stateKeys: Map<string, string> = new Map();
 
-  constructor(protected key?: string) {
-    super();
+  constructor(key?: string) {
+    super(key);
     const cacheKey = this.getCacheKey();
     const cachedState = GLOBAL("states").get(cacheKey);
     if (cachedState) {
@@ -37,6 +37,7 @@ abstract class Component extends DefaultComponent {
   private headFlat(): TNode<Tag> {
     let current = this.build();
     while (current instanceof Component) {
+      current.path = this.path;
       current = current.build();
     }
     return current;
@@ -51,26 +52,36 @@ abstract class Component extends DefaultComponent {
     throw new Error("Method not implemented.");
   }
   public flat(): TNode<Tag> {
-    function dfs(current: Component | TNode<Tag> | BaseTypes) {
+    function dfs(
+      current: Component | TNode<Tag> | BaseTypes,
+      parentPath: number[]
+    ) {
       if (current instanceof Component) {
-        current = current.headFlat();
+        current.path = parentPath;
+        current = DefaultComponent.withParentKey(current.key!, () => {
+          return (current as Component).headFlat();
+        });
       }
       if (current instanceof TNode) {
-        for (const child of current.children) {
-          dfs(child);
+        current.path = parentPath;
+        for (let i = 0; i < current.children.length; i++) {
+          const child = current.children[i];
+          dfs(child, [...parentPath, i]);
         }
       }
     }
 
-    const flatComponent = this.headFlat();
-    dfs(flatComponent);
+    const flatComponent = DefaultComponent.withParentKey(this.key!, () => {
+      return this.headFlat();
+    });
+    dfs(flatComponent, this.path);
     return flatComponent;
   }
 
   protected init(callback: () => void): void | Promise<void> {
-    this.render = false;
+    this.reactive = false;
     callback();
-    this.render = true;
+    this.reactive = true;
   }
 
   protected unmount(): void | Promise<void> {
@@ -82,10 +93,10 @@ abstract class Component extends DefaultComponent {
     this.path = path;
   }
 
-  public set(callback: () => void) {
-    this.render = false;
+  public pulse(callback: () => void) {
+    this.reactive = false;
     callback();
-    this.render = true;
+    this.reactive = true;
     this.rerender();
   }
 
@@ -143,10 +154,11 @@ abstract class Component extends DefaultComponent {
   }
 
   public rerender() {
-    if (!this.render) return;
+    if (!GLOBAL("reactive")) return;
+    if (!this.reactive) return;
     const build = this.flat();
-    diffing(this.path, convertElementToHTMLNMode(build));
     build.setPath(this.path);
+    diffing(this.path, convertElementToHTMLNMode(build));
   }
 
   public abstract build(): Component | TNode<Tag>;

@@ -1,4 +1,6 @@
-import { getElementFromPath } from "./utils";
+import { Component } from "..";
+import { Store } from "./store";
+import { getElementFromPath, GLOBAL } from "./utils";
 
 type Patch = {
   action: "remove" | "add" | "replace" | "update";
@@ -168,8 +170,18 @@ function diffing(path: number[], newTree: HTMLElement): void {
   applyPatches(oldTree, diffTrees(oldTree, newTree));
 }
 
-// function state<T>(value: T) {
-//   return value;
-// }
+function pulse(callback: () => void, dependencies: (Store<any> | Component)[]) {
+  GLOBAL("reactive", (_) => false);
+  console.log("PULSE");
+  callback();
+  console.log("END PULSE");
+  GLOBAL("reactive", (_) => true);
 
+  for (const dependency of dependencies) {
+    if (dependency instanceof Component) dependency.rerender();
+    else if (dependency instanceof Store) dependency.notifyComponents();
+  }
+}
+
+export { pulse };
 export default diffing;

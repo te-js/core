@@ -1,4 +1,5 @@
 import { Component } from "./component/component";
+import { GLOBAL } from "./utils";
 
 class Store<T extends object> {
   private listen: boolean = true;
@@ -32,11 +33,10 @@ class Store<T extends object> {
     return this.proxy(this.value);
   }
 
-  public set(callback: (value: T) => void) {
+  public pulse(callback: (value: T) => void) {
     this.listen = false;
     callback(this.value);
     this.listen = true;
-    // console.log(this.value);
     this.notifyComponents();
   }
 
@@ -44,11 +44,10 @@ class Store<T extends object> {
     this.components.delete(component);
   }
 
-  private notifyComponents(): void {
-    // console.log(this.components);
+  public notifyComponents(): void {
+    if (!GLOBAL("reactive")) return;
     for (const component of this.components) {
       component.rerender();
-      // console.log(component);
     }
   }
 }
